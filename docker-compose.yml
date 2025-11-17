@@ -8,7 +8,7 @@ services:
       - ./frontend:/frontend
       - /frontend/node_modules
 
-    command: yarn run dev
+    command: npm run dev
 
     ports:
       - "5173:5173"

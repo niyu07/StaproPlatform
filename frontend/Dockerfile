@@ -7,13 +7,10 @@ WORKDIR /frontend
 COPY package.json package-lock.json ./
 
 # 依存関係をインストール
-RUN yarn install
+RUN npm install
 
 # すべてのソースコードをコピー
 COPY . .
 
 # 開発サーバーのポートを公開
 EXPOSE "5173"
-
-# 開発サーバーをホストオプション付きで起動
-CMD ["npm", "run", "dev", "--host"]
