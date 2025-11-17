@@ -1,0 +1,41 @@
+name: Frontend CI / CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  ci:
+    name: CI (lint / format / build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Lint
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Format check
+        run: npm run format
+        working-directory: frontend
+
+      - name: Type check
+        run: npm run type-check
+        working-directory: frontend
+
+      - name: Build
+        run: npm run build
+        working-directory: frontend
