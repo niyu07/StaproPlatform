@@ -1,14 +1,13 @@
-import React from 'react';
 import { 
   LayoutDashboard, 
   Users, 
   BookOpen, 
-  Settings, 
-  LogOut
+  Settings
 } from 'lucide-react';
 import { SidebarItem } from '../SidebarItem/SidebarItem';
 import { Logo } from '../Logo/Logo';
 import { UserProfile } from '../UserProfile/UserProfile';
+import { LogoutButton } from '../LogoutButton/LogoutButton';
 import './Sidebar.css';
 
 export const Sidebar = () => {
@@ -38,10 +37,7 @@ export const Sidebar = () => {
 
       <div className="sidebar-footer">
         <UserProfile name="管理者" role="Admin" />
-        <button className="nav-item logout-btn">
-          <LogOut size={20} />
-          <span>ログアウト</span>
-        </button>
+        <LogoutButton />
       </div>
     </aside>
   );
