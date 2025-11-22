@@ -1,4 +1,4 @@
-import './UserProfile.css';
+import "./UserProfile.css";
 
 interface UserProfileProps {
   name: string;

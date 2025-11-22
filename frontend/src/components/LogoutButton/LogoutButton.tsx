@@ -1,5 +1,5 @@
-import { LogOut } from 'lucide-react';
-import './LogoutButton.css';
+import { LogOut } from "lucide-react";
+import "./LogoutButton.css";
 
 interface LogoutButtonProps {
   onClick?: () => void;

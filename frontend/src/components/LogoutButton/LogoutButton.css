@@ -3,7 +3,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: #EF4444; /* var(--color-danger) */
+  color: #ef4444; /* var(--color-danger) */
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -15,5 +15,5 @@
 }
 
 .logout-btn:hover {
-  background-color: #FEF2F2;
+  background-color: #fef2f2;
 }

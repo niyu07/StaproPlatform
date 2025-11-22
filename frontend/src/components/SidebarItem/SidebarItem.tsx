@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
-import './SidebarItem.css';
+import { NavLink } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import "./SidebarItem.css";
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -10,9 +10,9 @@ interface SidebarItemProps {
 
 export const SidebarItem = ({ icon: Icon, label, path }: SidebarItemProps) => {
   return (
-    <NavLink 
+    <NavLink
       to={path}
-      className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+      className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
     >
       <Icon size={20} />
       <span>{label}</span>

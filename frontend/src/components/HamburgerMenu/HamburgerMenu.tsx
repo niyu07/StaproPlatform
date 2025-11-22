@@ -1,5 +1,5 @@
-import { Menu } from 'lucide-react';
-import './HamburgerMenu.css';
+import { Menu } from "lucide-react";
+import "./HamburgerMenu.css";
 
 interface HamburgerMenuProps {
   onClick?: () => void;
