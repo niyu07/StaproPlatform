@@ -7,7 +7,7 @@ interface HamburgerMenuProps {
 
 export const HamburgerMenu = ({ onClick }: HamburgerMenuProps) => {
   return (
-    <button className="menu-btn mobile-only" onClick={onClick}>
+    <button className="menu-btn" onClick={onClick}>
       <Menu size={24} />
     </button>
   );
