@@ -9,9 +9,10 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="students" element={<div className="p-6"><h2>生徒管理</h2><p>開発中...</p></div>} />
-          <Route path="courses" element={<div className="p-6"><h2>コース管理</h2><p>開発中...</p></div>} />
-          <Route path="settings" element={<div className="p-6"><h2>設定</h2><p>開発中...</p></div>} />
+          <Route path="schedule" element={<div className="p-6"><h2>スケジュール管理</h2><p>開発中...</p></div>} />
+          <Route path="students" element={<div className="p-6"><h2>生徒情報</h2><p>開発中...</p></div>} />
+          <Route path="curriculum" element={<div className="p-6"><h2>カリキュラム管理</h2><p>開発中...</p></div>} />
+          <Route path="ai" element={<div className="p-6"><h2>AI連携</h2><p>開発中...</p></div>} />
         </Route>
       </Routes>
     </BrowserRouter>

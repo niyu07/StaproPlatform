@@ -1,5 +1,6 @@
 import { 
-  LayoutDashboard, 
+  LayoutGrid, 
+  Calendar, 
   Users, 
   BookOpen, 
   Settings
@@ -12,10 +13,11 @@ import './Sidebar.css';
 
 export const Sidebar = () => {
   const navItems = [
-    { icon: LayoutDashboard, label: 'ダッシュボード', path: '/' },
-    { icon: Users, label: '生徒管理', path: '/students' },
-    { icon: BookOpen, label: 'コース管理', path: '/courses' },
-    { icon: Settings, label: '設定', path: '/settings' },
+    { icon: LayoutGrid, label: 'ダッシュボード', path: '/' },
+    { icon: Calendar, label: 'スケジュール管理', path: '/schedule' },
+    { icon: Users, label: '生徒情報', path: '/students' },
+    { icon: BookOpen, label: 'カリキュラム管理', path: '/curriculum' },
+    { icon: Settings, label: 'AI連携', path: '/ai' },
   ];
 
   return (
