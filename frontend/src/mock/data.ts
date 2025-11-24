@@ -227,7 +227,7 @@ export const getStudentById = (user_id: number): Student | undefined =>
   mockStudents.find((s) => s.user_id === user_id);
 
 export const getCurriculumMasterById = (
-  id: number
+  id: number,
 ): CurriculumMaster | undefined =>
   mockCurriculumMasters.find((c) => c.id === id);
 
@@ -244,4 +244,3 @@ export const getCurriculumWithRelations = (curriculum: Curriculum) => ({
   student: getStudentById(curriculum.user_id),
   curriculum_master: getCurriculumMasterById(curriculum.curriculum_id),
 });
-

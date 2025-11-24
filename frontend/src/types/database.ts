@@ -68,4 +68,3 @@ export interface CurriculumWithRelations extends Curriculum {
   student?: Student;
   curriculum_master?: CurriculumMaster;
 }
-

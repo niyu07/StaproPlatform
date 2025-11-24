@@ -40,4 +40,3 @@ const scheduleWithRelations = getScheduleWithRelations(schedule);
 - スケジュールの日時は実行時に動的に生成されます（現在日時を基準）
 - UUIDはモック用の固定値です
 - 実際のSupabaseデータベースに接続する際は、このモックデータを置き換えてください
-
