@@ -32,7 +32,6 @@ export interface Student {
 
 // 授業スケジュール
 export interface Schedule {
-  id: number;
   school_id: number;
   title: string;
   mentor_id: number;

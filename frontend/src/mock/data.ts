@@ -74,7 +74,6 @@ const getDateString = (days: number, hours: number, minutes: number = 0) => {
 export const mockSchedules: Schedule[] = [
   // 田中一郎のスケジュール
   {
-    id: 1,
     school_id: 1, // 出汐校
     title: "スクラッチ基礎",
     mentor_id: 1, // 河村
@@ -83,7 +82,6 @@ export const mockSchedules: Schedule[] = [
     end_time: getDateString(1, 16, 30), // 明日16:30
   },
   {
-    id: 2,
     school_id: 1,
     title: "HTML入門",
     mentor_id: 2, // 宇田
@@ -93,7 +91,6 @@ export const mockSchedules: Schedule[] = [
   },
   // 木村太郎のスケジュール
   {
-    id: 3,
     school_id: 2, // 五日市校
     title: "Javascript基礎",
     mentor_id: 3, // 西岡
@@ -102,7 +99,6 @@ export const mockSchedules: Schedule[] = [
     end_time: getDateString(2, 18, 30),
   },
   {
-    id: 4,
     school_id: 2,
     title: "Unity入門",
     mentor_id: 1, // 河村
@@ -112,7 +108,6 @@ export const mockSchedules: Schedule[] = [
   },
   // 竹本花子のスケジュール
   {
-    id: 5,
     school_id: 3, // 西風新都校
     title: "マイクラプログラミング",
     mentor_id: 2, // 宇田
@@ -121,7 +116,6 @@ export const mockSchedules: Schedule[] = [
     end_time: getDateString(3, 17, 30),
   },
   {
-    id: 6,
     school_id: 3,
     title: "スクラッチ応用",
     mentor_id: 3, // 西岡
@@ -131,7 +125,6 @@ export const mockSchedules: Schedule[] = [
   },
   // 過去のスケジュール（履歴用）
   {
-    id: 7,
     school_id: 1,
     title: "スクラッチ基礎",
     mentor_id: 1,
@@ -140,7 +133,6 @@ export const mockSchedules: Schedule[] = [
     end_time: getDateString(-7, 16, 30),
   },
   {
-    id: 8,
     school_id: 2,
     title: "Javascript基礎",
     mentor_id: 3,
