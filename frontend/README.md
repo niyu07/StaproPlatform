@@ -25,9 +25,10 @@ docker-compose up -d
 
 1. アプリケーションへのアクセス
 
-```text
-http://localhost:5173
-```
+
+Frontend: http://localhost:5173
+
+Backend API: http://localhost:8080
 
 ### よく使うコマンド
 
