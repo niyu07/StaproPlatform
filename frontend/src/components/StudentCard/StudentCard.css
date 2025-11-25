@@ -2,17 +2,17 @@
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: none;
+  border: 1px solid #f0f0f0;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
 }
 
 .student-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  border-color: #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .student-card-header {
@@ -22,21 +22,18 @@
 }
 
 .student-name {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
 }
 
 .student-grade {
-  font-size: 14px;
-  color: #666;
-  font-weight: 400;
-}
-
-.student-card-divider {
-  height: 1px;
-  background: linear-gradient(to right, #e0e0e0, transparent);
+  width: 24px;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  margin-top: 4px;
 }
 
 .student-card-section {
@@ -46,9 +43,9 @@
 }
 
 .section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
   margin: 0;
 }
 
@@ -61,41 +58,38 @@
 .curriculum-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #e6f0ff;
+  color: #0056b3;
   border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: transform 0.2s ease;
-}
-
-.curriculum-badge:hover {
-  transform: scale(1.05);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .badge-icon {
-  font-size: 14px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  color: #0056b3;
 }
 
 .schedule-time {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border-left: 4px solid #667eea;
+  gap: 12px;
 }
 
 .time-icon {
   font-size: 20px;
+  display: flex;
+  align-items: center;
+  color: #999;
 }
 
 .time-text {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
   color: #1a1a1a;
 }
 
@@ -105,39 +99,22 @@
 
 .memo-input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s ease;
+  resize: none;
   background: #fafafa;
+  color: #333;
 }
 
 .memo-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #e0e0e0;
   background: white;
 }
 
 .memo-input::placeholder {
   color: #999;
-}
-
-
-
-/* レスポンシブデザイン */
-@media (max-width: 768px) {
-  .student-card {
-    padding: 20px;
-  }
-
-  .student-name {
-    font-size: 20px;
-  }
-
-  .time-text {
-    font-size: 16px;
-  }
 }

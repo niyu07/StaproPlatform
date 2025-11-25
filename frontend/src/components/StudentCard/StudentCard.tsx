@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
 import "./StudentCard.css";
 
@@ -8,13 +9,17 @@ interface StudentCardProps {
     student: Student;
     curriculum?: CurriculumMaster;
     nextSchedule?: Schedule;
+    onSaveMemo?: (userId: number, memo: string) => void;
 }
 
 export const StudentCard = ({
     student,
     curriculum,
     nextSchedule,
+    onSaveMemo,
 }: StudentCardProps) => {
+    const [memo, setMemo] = useState(student.memo || "");
+
     // 次回授業時間をフォーマット
     const formatScheduleTime = (schedule?: Schedule) => {
         if (!schedule) return "未定";
@@ -24,14 +29,21 @@ export const StudentCard = ({
         return `${hours}:${minutes}`;
     };
 
+    const handleMemoChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMemo(e.target.value);
+    };
+
+    const handleMemoBlur = () => {
+        if (onSaveMemo && memo !== student.memo) {
+            onSaveMemo(student.user_id, memo);
+        }
+    };
+
     return (
         <div className="student-card">
             <div className="student-card-header">
                 <h3 className="student-name">{student.name}</h3>
-                <span className="student-grade">{student.grade}</span>
             </div>
-
-            <div className="student-card-divider"></div>
 
             <div className="student-card-section">
                 <h4 className="section-title">カリキュラム</h4>
@@ -53,7 +65,7 @@ export const StudentCard = ({
                 <h4 className="section-title">授業時間</h4>
                 <div className="schedule-time">
                     <span className="time-icon">
-                        <ClockIcon size={20} color="#667eea" />
+                        <ClockIcon size={20} />
                     </span>
                     <span className="time-text">{formatScheduleTime(nextSchedule)}</span>
                 </div>
@@ -64,8 +76,11 @@ export const StudentCard = ({
                 <div className="memo-area">
                     <textarea
                         className="memo-input"
-                        placeholder="メモを入力..."
+                        placeholder="メモ"
                         rows={3}
+                        value={memo}
+                        onChange={handleMemoChange}
+                        onBlur={handleMemoBlur}
                     />
                 </div>
             </div>
