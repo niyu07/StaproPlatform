@@ -15,8 +15,7 @@ export const StudentsList = () => {
     const [students, setStudents] = useState(initialMockStudents);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-
+    const [searchQuery, setSearchQuery] = useState("");
 
     // 詳細ボタンクリック時の処理
     const handleDetailClick = (student: Student) => {
@@ -59,6 +58,19 @@ export const StudentsList = () => {
         };
     };
 
+    // 検索フィルタリング
+    const filteredStudents = students.filter((student) => {
+        const { curriculum } = getStudentData(student.user_id);
+        const query = searchQuery.toLowerCase().trim();
+        if (!query) return true;
+
+        const nameMatch = student.name.toLowerCase().includes(query);
+        const gradeMatch = student.grade.toLowerCase().includes(query);
+        const curriculumMatch = curriculum?.name.toLowerCase().includes(query) || false;
+
+        return nameMatch || gradeMatch || curriculumMatch;
+    });
+
     return (
         <div className="students-list-container">
             <div className="students-list-header">
@@ -70,12 +82,16 @@ export const StudentsList = () => {
 
             <div className="search-section">
                 <div className="search-card">
-                    <SearchBar placeholder="生徒名、学年、科目で検索..." />
+                    <SearchBar
+                        placeholder="生徒名、学年、科目で検索..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
             </div>
 
             <div className="students-grid">
-                {students.map((student) => {
+                {filteredStudents.map((student) => {
                     const { curriculum, nextSchedule } = getStudentData(
                         student.user_id
                     );
@@ -85,7 +101,6 @@ export const StudentsList = () => {
                             student={student}
                             curriculum={curriculum}
                             nextSchedule={nextSchedule}
-
                             onDetailClick={handleDetailClick}
                         />
                     );
