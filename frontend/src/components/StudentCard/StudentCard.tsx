@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
 import "./StudentCard.css";
 
@@ -10,6 +10,7 @@ interface StudentCardProps {
     curriculum?: CurriculumMaster;
     nextSchedule?: Schedule;
     onSaveMemo?: (userId: number, memo: string) => void;
+    onDetailClick?: (student: Student) => void;
 }
 
 export const StudentCard = ({
@@ -17,8 +18,14 @@ export const StudentCard = ({
     curriculum,
     nextSchedule,
     onSaveMemo,
+    onDetailClick,
 }: StudentCardProps) => {
     const [memo, setMemo] = useState(student.memo || "");
+
+    // propsの変更を検知してstateを更新（モーダルでの編集反映用）
+    useEffect(() => {
+        setMemo(student.memo || "");
+    }, [student.memo]);
 
     // 次回授業時間をフォーマット
     const formatScheduleTime = (schedule?: Schedule) => {
@@ -43,6 +50,7 @@ export const StudentCard = ({
         <div className="student-card">
             <div className="student-card-header">
                 <h3 className="student-name">{student.name}</h3>
+                <div className="student-grade"></div>
             </div>
 
             <div className="student-card-section">
@@ -85,7 +93,7 @@ export const StudentCard = ({
                 </div>
             </div>
 
-            <Button variant="outline" fullWidth>
+            <Button variant="outline" fullWidth onClick={() => onDetailClick?.(student)}>
                 詳細を見る
             </Button>
         </div>

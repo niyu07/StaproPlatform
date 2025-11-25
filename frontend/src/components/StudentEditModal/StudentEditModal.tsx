@@ -1,0 +1,129 @@
+import React, { useState, useEffect } from "react";
+import type { Student } from "../../types/database";
+import { Button } from "../Button/Button";
+import "./StudentEditModal.css";
+
+interface StudentEditModalProps {
+    isOpen: boolean;
+    student: Student | null;
+    onClose: () => void;
+    onSave: (updatedStudent: Student) => void;
+}
+
+export const StudentEditModal = ({
+    isOpen,
+    student,
+    onClose,
+    onSave,
+}: StudentEditModalProps) => {
+    const [formData, setFormData] = useState<Student | null>(null);
+
+    useEffect(() => {
+        if (student) {
+            setFormData({ ...student });
+        }
+    }, [student]);
+
+    if (!isOpen || !formData) return null;
+
+    const handleChange = (
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (formData) {
+            onSave(formData);
+            onClose();
+        }
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2>生徒情報の編集</h2>
+                    <button className="close-button" onClick={onClose}>
+                        ×
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">名前</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="grade">学年</label>
+                        <input
+                            type="text"
+                            id="grade"
+                            name="grade"
+                            value={formData.grade}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="email">メールアドレス</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="status">ステータス</label>
+                        <select
+                            id="status"
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                        >
+                            <option value="active">在籍中 (Active)</option>
+                            <option value="inactive">休会・退会 (Inactive)</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="memo">メモ</label>
+                        <textarea
+                            id="memo"
+                            name="memo"
+                            value={formData.memo || ""}
+                            onChange={handleChange}
+                            rows={4}
+                        />
+                    </div>
+
+                    <div className="modal-actions">
+                        <Button type="button" variant="ghost" onClick={onClose}>
+                            キャンセル
+                        </Button>
+                        <Button type="submit" variant="primary">
+                            保存する
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};

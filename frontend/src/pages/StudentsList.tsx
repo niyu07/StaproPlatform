@@ -1,6 +1,8 @@
 import { useState } from "react";
+import type { Student } from "../types/database";
 import { StudentCard } from "../components/StudentCard/StudentCard";
 import { SearchBar } from "../components/SearchBar/SearchBar";
+import { StudentEditModal } from "../components/StudentEditModal/StudentEditModal";
 import {
     mockStudents as initialMockStudents,
     mockCurriculums,
@@ -11,18 +13,35 @@ import "./StudentsList.css";
 
 export const StudentsList = () => {
     const [students, setStudents] = useState(initialMockStudents);
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // メモ保存処理
+    // メモ保存処理（カード上の簡易編集）
     const handleSaveMemo = (userId: number, memo: string) => {
         console.log(`Saving memo for user ${userId}: ${memo}`);
-
-        // 実際のアプリではここでAPIを呼び出してDBを更新します
-        // 今回はローカルのstateを更新して擬似的に保存を再現します
         setStudents((prevStudents) =>
             prevStudents.map((student) =>
                 student.user_id === userId ? { ...student, memo } : student
             )
         );
+    };
+
+    // 詳細ボタンクリック時の処理
+    const handleDetailClick = (student: Student) => {
+        setSelectedStudent(student);
+        setIsModalOpen(true);
+    };
+
+    // 生徒情報の更新処理（モーダルからの保存）
+    const handleUpdateStudent = (updatedStudent: Student) => {
+        console.log("Updating student:", updatedStudent);
+        setStudents((prevStudents) =>
+            prevStudents.map((student) =>
+                student.user_id === updatedStudent.user_id ? updatedStudent : student
+            )
+        );
+        setIsModalOpen(false);
+        setSelectedStudent(null);
     };
 
     // 各生徒のカリキュラムと次回スケジュールを取得
@@ -75,10 +94,18 @@ export const StudentsList = () => {
                             curriculum={curriculum}
                             nextSchedule={nextSchedule}
                             onSaveMemo={handleSaveMemo}
+                            onDetailClick={handleDetailClick}
                         />
                     );
                 })}
             </div>
+
+            <StudentEditModal
+                isOpen={isModalOpen}
+                student={selectedStudent}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleUpdateStudent}
+            />
         </div>
     );
 };
