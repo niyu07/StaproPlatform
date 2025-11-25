@@ -28,7 +28,7 @@ export const StudentEditModal = ({
   const [formData, setFormData] = useState<Student>(emptyStudent);
 
   // モーダルが開いた時や student が変わった時にフォームをリセット
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (student) {
       setFormData({ ...student });
@@ -36,6 +36,7 @@ export const StudentEditModal = ({
       setFormData({ ...emptyStudent });
     }
   }, [student, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 
