@@ -2,6 +2,7 @@ import type { Student, CurriculumMaster, Schedule } from "../../types/database";
 import "./StudentCard.css";
 
 import { Button } from "../Button/Button";
+import { BookIcon, ClockIcon } from "../Icons";
 
 interface StudentCardProps {
     student: Student;
@@ -37,7 +38,9 @@ export const StudentCard = ({
                 <div className="curriculum-badges">
                     {curriculum ? (
                         <span className="curriculum-badge">
-                            <span className="badge-icon">📚</span>
+                            <span className="badge-icon">
+                                <BookIcon size={14} />
+                            </span>
                             {curriculum.name}
                         </span>
                     ) : (
@@ -49,7 +52,9 @@ export const StudentCard = ({
             <div className="student-card-section">
                 <h4 className="section-title">授業時間</h4>
                 <div className="schedule-time">
-                    <span className="time-icon">🕐</span>
+                    <span className="time-icon">
+                        <ClockIcon size={20} color="#667eea" />
+                    </span>
                     <span className="time-text">{formatScheduleTime(nextSchedule)}</span>
                 </div>
             </div>
