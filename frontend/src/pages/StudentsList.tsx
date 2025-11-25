@@ -16,15 +16,7 @@ export const StudentsList = () => {
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // メモ保存処理（カード上の簡易編集）
-    const handleSaveMemo = (userId: number, memo: string) => {
-        console.log(`Saving memo for user ${userId}: ${memo}`);
-        setStudents((prevStudents) =>
-            prevStudents.map((student) =>
-                student.user_id === userId ? { ...student, memo } : student
-            )
-        );
-    };
+
 
     // 詳細ボタンクリック時の処理
     const handleDetailClick = (student: Student) => {
@@ -93,7 +85,7 @@ export const StudentsList = () => {
                             student={student}
                             curriculum={curriculum}
                             nextSchedule={nextSchedule}
-                            onSaveMemo={handleSaveMemo}
+
                             onDetailClick={handleDetailClick}
                         />
                     );

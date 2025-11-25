@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
 import "./StudentCard.css";
 
@@ -9,7 +9,6 @@ interface StudentCardProps {
     student: Student;
     curriculum?: CurriculumMaster;
     nextSchedule?: Schedule;
-    onSaveMemo?: (userId: number, memo: string) => void;
     onDetailClick?: (student: Student) => void;
 }
 
@@ -17,16 +16,8 @@ export const StudentCard = ({
     student,
     curriculum,
     nextSchedule,
-    onSaveMemo,
     onDetailClick,
 }: StudentCardProps) => {
-    const [memo, setMemo] = useState(student.memo || "");
-
-    // propsの変更を検知してstateを更新（モーダルでの編集反映用）
-    useEffect(() => {
-        setMemo(student.memo || "");
-    }, [student.memo]);
-
     // 次回授業時間をフォーマット
     const formatScheduleTime = (schedule?: Schedule) => {
         if (!schedule) return "未定";
@@ -34,16 +25,6 @@ export const StudentCard = ({
         const hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, "0");
         return `${hours}:${minutes}`;
-    };
-
-    const handleMemoChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setMemo(e.target.value);
-    };
-
-    const handleMemoBlur = () => {
-        if (onSaveMemo && memo !== student.memo) {
-            onSaveMemo(student.user_id, memo);
-        }
     };
 
     return (
@@ -85,9 +66,8 @@ export const StudentCard = ({
                         className="memo-input"
                         placeholder="メモ"
                         rows={3}
-                        value={memo}
-                        onChange={handleMemoChange}
-                        onBlur={handleMemoBlur}
+                        value={student.memo || ""}
+                        readOnly
                     />
                 </div>
             </div>
