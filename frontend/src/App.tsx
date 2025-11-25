@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Dashboard } from "./pages/Dashboard";
+import { StudentsList } from "./pages/StudentsList";
 import "./App.css";
 
 function App() {
@@ -18,15 +19,7 @@ function App() {
               </div>
             }
           />
-          <Route
-            path="students"
-            element={
-              <div className="p-6">
-                <h2>生徒情報</h2>
-                <p>開発中...</p>
-              </div>
-            }
-          />
+          <Route path="students" element={<StudentsList />} />
           <Route
             path="curriculum"
             element={
