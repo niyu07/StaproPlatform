@@ -26,7 +26,6 @@ export const StudentEditModal = ({
   onSave,
 }: StudentEditModalProps) => {
   const [formData, setFormData] = useState<Student>(emptyStudent);
-  const isEditMode = student !== null;
 
   useEffect(() => {
     if (student) {
@@ -44,7 +43,7 @@ export const StudentEditModal = ({
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => (prev ? { ...prev, [name]: value } : null));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
