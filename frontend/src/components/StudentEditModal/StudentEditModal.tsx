@@ -27,6 +27,8 @@ export const StudentEditModal = ({
 }: StudentEditModalProps) => {
   const [formData, setFormData] = useState<Student>(emptyStudent);
 
+  // モーダルが開いた時や student が変わった時にフォームをリセット
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (student) {
       setFormData({ ...student });
