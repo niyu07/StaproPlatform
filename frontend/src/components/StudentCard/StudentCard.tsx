@@ -50,7 +50,6 @@ export const StudentCard = ({
         <div className="student-card">
             <div className="student-card-header">
                 <h3 className="student-name">{student.name}</h3>
-                <div className="student-grade"></div>
             </div>
 
             <div className="student-card-section">
