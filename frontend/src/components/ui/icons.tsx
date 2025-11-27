@@ -67,3 +67,4 @@ export const SearchIcon: React.FC<IconProps> = ({
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
+

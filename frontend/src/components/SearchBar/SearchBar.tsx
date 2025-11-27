@@ -1,5 +1,5 @@
 import React from "react";
-import { SearchIcon } from "../Icons";
+import { SearchIcon } from "../ui/icons";
 import "./SearchBar.css";
 
 interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Student } from "../../types/database";
-import { Button } from "../Button/Button";
+import { Button } from "../ui/button";
 import "./StudentEditModal.css";
 
 interface StudentEditModalProps {
@@ -147,7 +147,7 @@ export const StudentEditModal = ({
             <Button type="button" variant="ghost" onClick={onClose}>
               キャンセル
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="default">
               保存する
             </Button>
           </div>

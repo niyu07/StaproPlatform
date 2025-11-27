@@ -1,8 +1,8 @@
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
 import "./StudentCard.css";
 
-import { Button } from "../Button/Button";
-import { BookIcon, ClockIcon } from "../Icons";
+import { Button } from "../ui/button";
+import { BookIcon, ClockIcon } from "../ui/icons";
 
 interface StudentCardProps {
   student: Student;
@@ -73,7 +73,7 @@ export const StudentCard = ({
 
       <Button
         variant="outline"
-        fullWidth
+        className="w-full"
         onClick={() => onDetailClick?.(student)}
       >
         詳細を見る
