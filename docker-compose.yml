@@ -15,3 +15,20 @@ services:
 
     stdin_open: true
     tty: true
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    volumes:
+      - ./backend:/backend
+
+    command: go run main.go
+
+    ports:
+      - "8080:8080"
+
+    stdin_open: true
+    tty: true
