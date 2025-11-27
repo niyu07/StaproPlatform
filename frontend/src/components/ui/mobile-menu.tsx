@@ -1,10 +1,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "./button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "./sheet";
+import { Sheet, SheetContent, SheetTrigger } from "./sheet";
 
 interface MobileMenuProps {
   children: React.ReactNode;
@@ -25,4 +21,3 @@ export const MobileMenu = ({ children }: MobileMenuProps) => {
     </Sheet>
   );
 };
-

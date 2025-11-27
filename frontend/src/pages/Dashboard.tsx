@@ -9,9 +9,11 @@ export const Dashboard = () => {
         <p className="text-muted-foreground mb-6">
           左側のメニューから操作を選択してください。
         </p>
-        
+
         <div className="flex gap-4 flex-wrap">
-          <h2 className="w-full text-xl font-semibold mb-2">shadcn/ui コンポーネントテスト</h2>
+          <h2 className="w-full text-xl font-semibold mb-2">
+            shadcn/ui コンポーネントテスト
+          </h2>
           <Button>デフォルトボタン</Button>
           <Button variant="secondary">セカンダリボタン</Button>
           <Button variant="destructive">削除ボタン</Button>

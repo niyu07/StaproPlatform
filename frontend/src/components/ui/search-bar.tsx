@@ -16,7 +16,7 @@ export const SearchBar = ({
     <div
       className={cn(
         "flex items-center bg-muted rounded-lg px-4 py-2 w-full transition-all border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
-        className
+        className,
       )}
     >
       <div className="flex items-center mr-3 text-muted-foreground">
@@ -31,4 +31,3 @@ export const SearchBar = ({
     </div>
   );
 };
-

@@ -23,4 +23,3 @@ export const UserProfile = ({ name, role, avatarLabel }: UserProfileProps) => {
     </div>
   );
 };
-

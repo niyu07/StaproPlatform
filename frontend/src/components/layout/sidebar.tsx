@@ -37,4 +37,3 @@ export const Sidebar = () => {
     </aside>
   );
 };
-

@@ -53,14 +53,17 @@ export const StudentEditModal = ({
   }, [student, isOpen]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleStatusChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, status: value as "active" | "inactive" }));
+    setFormData((prev) => ({
+      ...prev,
+      status: value as "active" | "inactive",
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -151,4 +154,3 @@ export const StudentEditModal = ({
     </Dialog>
   );
 };
-

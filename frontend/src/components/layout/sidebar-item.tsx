@@ -16,7 +16,7 @@ export const SidebarItem = ({ icon: Icon, label, path }: SidebarItemProps) => {
         cn(
           "flex items-center gap-3 px-4 py-3 rounded-md text-muted-foreground no-underline font-medium text-sm transition-all",
           "hover:bg-muted hover:text-foreground",
-          isActive && "bg-primary/10 text-primary"
+          isActive && "bg-primary/10 text-primary",
         )
       }
     >
@@ -25,4 +25,3 @@ export const SidebarItem = ({ icon: Icon, label, path }: SidebarItemProps) => {
     </NavLink>
   );
 };
-
