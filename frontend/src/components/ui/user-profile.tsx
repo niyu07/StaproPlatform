@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback } from "./avatar";
-import "./user-profile.css";
 
 interface UserProfileProps {
   name: string;
@@ -11,14 +10,14 @@ export const UserProfile = ({ name, role, avatarLabel }: UserProfileProps) => {
   const displayAvatar = avatarLabel || name.charAt(0);
 
   return (
-    <div className="user-profile-area">
-      <div className="user-info">
+    <div className="flex items-center justify-between p-2 bg-background rounded-md">
+      <div className="flex items-center gap-3">
         <Avatar>
           <AvatarFallback>{displayAvatar}</AvatarFallback>
         </Avatar>
-        <div className="user-details">
-          <span className="username">{name}</span>
-          <span className="user-role">{role}</span>
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm text-foreground">{name}</span>
+          <span className="text-xs text-muted-foreground">{role}</span>
         </div>
       </div>
     </div>
