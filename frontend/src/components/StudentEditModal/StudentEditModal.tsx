@@ -27,8 +27,7 @@ export const StudentEditModal = ({
 }: StudentEditModalProps) => {
   const [formData, setFormData] = useState<Student>(emptyStudent);
 
-  // モーダルが開いた時や student が変わった時にフォームをリセット
-  /* eslint-disable react-hooks/set-state-in-effect */
+  // Reset form when the modal opens or the selected student changes
   useEffect(() => {
     if (student) {
       setFormData({ ...student });
@@ -36,14 +35,13 @@ export const StudentEditModal = ({
       setFormData({ ...emptyStudent });
     }
   }, [student, isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -51,18 +49,35 @@ export const StudentEditModal = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData) {
-      onSave(formData);
+    onSave(formData);
+    onClose();
+  };
+
+  // Close modal when Escape key is pressed
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") {
       onClose();
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} aria-hidden="true">
+      <div
+        className="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="student-edit-modal-title"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
+        tabIndex={-1}
+      >
         <div className="modal-header">
-          <h2>生徒情報の編集</h2>
-          <button className="close-button" onClick={onClose}>
+          <h2 id="student-edit-modal-title">生徒情報の編集</h2>
+          <button
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close"
+          >
             ×
           </button>
         </div>
