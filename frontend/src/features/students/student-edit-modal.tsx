@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import type { Student } from "../../types/database";
 import { Button } from "../../components/ui/button";
 import {
