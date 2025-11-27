@@ -28,6 +28,7 @@ export interface Student {
   grade: string;
   email: string;
   status: "active" | "inactive";
+  memo?: string;
 }
 
 // 授業スケジュール

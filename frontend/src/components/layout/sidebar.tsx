@@ -1,9 +1,8 @@
 import { LayoutGrid, Calendar, Users, BookOpen, Settings } from "lucide-react";
-import { SidebarItem } from "../SidebarItem/SidebarItem";
-import { Logo } from "../Logo/Logo";
-import { UserProfile } from "../UserProfile/UserProfile";
-import { LogoutButton } from "../LogoutButton/LogoutButton";
-import "./Sidebar.css";
+import { SidebarItem } from "./sidebar-item";
+import { Logo } from "../ui/logo";
+import { UserProfile } from "../ui/user-profile";
+import { LogoutButton } from "../ui/logout-button";
 
 export const Sidebar = () => {
   const navItems = [
@@ -15,12 +14,12 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-header">
+    <aside className="w-[260px] bg-background border-r border-border flex flex-col h-full flex-shrink-0">
+      <div className="h-16 flex items-center px-6 border-b border-border">
         <Logo />
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
         {navItems.map((item) => (
           <SidebarItem
             key={item.path}
@@ -31,7 +30,7 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      <div className="sidebar-footer">
+      <div className="p-4 border-t border-border flex flex-col gap-4">
         <UserProfile name="管理者" role="Admin" />
         <LogoutButton />
       </div>

@@ -1,34 +1,24 @@
-import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { HamburgerMenu } from "../components/HamburgerMenu/HamburgerMenu";
-import { Sidebar } from "../components/Sidebar/Sidebar";
+import { Sidebar } from "../components/layout/sidebar";
+import { MobileMenu } from "../components/ui/mobile-menu";
 import "./MainLayout.css";
 
 export const MainLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
   return (
     <div className="main-layout">
-      {/* Overlay for mobile */}
-      {isSidebarOpen && (
-        <div className="sidebar-overlay" onClick={closeSidebar}></div>
-      )}
-
-      <div className={`sidebar-wrapper ${isSidebarOpen ? "open" : ""}`}>
+      {/* Desktop Sidebar - Always visible (md: 768px+) */}
+      <aside className="hidden md:block sidebar-wrapper">
         <Sidebar />
-      </div>
+      </aside>
 
       <main className="main-content">
         <header className="top-header">
-          <HamburgerMenu onClick={toggleSidebar} />
+          {/* Mobile Menu Button (visible only on mobile) */}
+          <div className="md:hidden">
+            <MobileMenu>
+              <Sidebar />
+            </MobileMenu>
+          </div>
         </header>
         <div className="content-scrollable">
           <Outlet />

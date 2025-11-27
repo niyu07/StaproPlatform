@@ -44,6 +44,7 @@ export const mockStudents: Student[] = [
     grade: "小学5年生",
     email: "tanaka.ichiro@example.com",
     status: "active",
+    memo: "スクラッチが得意。次はHTMLに挑戦したい。",
   },
   {
     user_id: 102,
@@ -51,6 +52,7 @@ export const mockStudents: Student[] = [
     grade: "中学1年生",
     email: "kimura.taro@example.com",
     status: "active",
+    memo: "Javascriptの基礎を学習中。",
   },
   {
     user_id: 103,
@@ -58,6 +60,7 @@ export const mockStudents: Student[] = [
     grade: "小学3年生",
     email: "takemoto.hanako@example.com",
     status: "active",
+    memo: "マイクラで建築を作るのが好き。",
   },
 ];
 

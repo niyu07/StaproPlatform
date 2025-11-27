@@ -1,0 +1,115 @@
+import { useState } from "react";
+import type { Student } from "../types/database";
+import { StudentCard } from "../features/students/student-card";
+import { SearchBar } from "../components/ui/search-bar";
+import { StudentEditModal } from "../features/students/student-edit-modal";
+import {
+  mockStudents as initialMockStudents,
+  mockCurriculums,
+  mockSchedules,
+  getCurriculumMasterById,
+} from "../mock/data";
+import "./StudentsList.css";
+
+export const StudentsList = () => {
+  const [students, setStudents] = useState(initialMockStudents);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // 詳細ボタンクリック時の処理
+  const handleDetailClick = (student: Student) => {
+    setSelectedStudent(student);
+    setIsModalOpen(true);
+  };
+
+  // 生徒情報の更新処理（モーダルからの保存）
+  const handleUpdateStudent = (updatedStudent: Student) => {
+    console.log("Updating student:", updatedStudent);
+    setStudents((prevStudents) =>
+      prevStudents.map((student) =>
+        student.user_id === updatedStudent.user_id ? updatedStudent : student,
+      ),
+    );
+    setIsModalOpen(false);
+    setSelectedStudent(null);
+  };
+
+  // 各生徒のカリキュラムと次回スケジュールを取得
+  const getStudentData = (userId: number) => {
+    // 生徒のカリキュラムを取得（最初の1つを表示）
+    const studentCurriculum = mockCurriculums
+      .filter((c) => c.user_id === userId)
+      .map((c) => getCurriculumMasterById(c.curriculum_id))
+      .find((c) => c !== undefined);
+
+    // 次回のスケジュールを取得（未来の最も近いスケジュール）
+    const now = new Date();
+    const nextSchedule = mockSchedules
+      .filter((s) => s.user_id === userId && new Date(s.start_time) > now)
+      .sort(
+        (a, b) =>
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+      )[0];
+
+    return {
+      curriculum: studentCurriculum,
+      nextSchedule,
+    };
+  };
+
+  // 検索フィルタリング
+  const filteredStudents = students.filter((student) => {
+    const { curriculum } = getStudentData(student.user_id);
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+
+    const nameMatch = student.name.toLowerCase().includes(query);
+    const gradeMatch = student.grade.toLowerCase().includes(query);
+    const curriculumMatch =
+      curriculum?.name.toLowerCase().includes(query) || false;
+
+    return nameMatch || gradeMatch || curriculumMatch;
+  });
+
+  return (
+    <div className="students-list-container">
+      <div className="students-list-header">
+        <h1 className="page-title">生徒情報</h1>
+        <p className="page-description">登録されている生徒の一覧と詳細情報</p>
+      </div>
+
+      <div className="search-section">
+        <div className="search-card">
+          <SearchBar
+            placeholder="生徒名、学年、科目で検索..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="students-grid">
+        {filteredStudents.map((student) => {
+          const { curriculum, nextSchedule } = getStudentData(student.user_id);
+          return (
+            <StudentCard
+              key={student.user_id}
+              student={student}
+              curriculum={curriculum}
+              nextSchedule={nextSchedule}
+              onDetailClick={handleDetailClick}
+            />
+          );
+        })}
+      </div>
+
+      <StudentEditModal
+        isOpen={isModalOpen}
+        student={selectedStudent}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleUpdateStudent}
+      />
+    </div>
+  );
+};
