@@ -3,6 +3,7 @@ import "./student-card.css";
 
 import { Button } from "../../components/ui/button";
 import { BookIcon, ClockIcon } from "../../components/ui/icons";
+import { SectionTitle } from "../../components/ui/section-title";
 
 interface StudentCardProps {
   student: Student;
@@ -33,7 +34,7 @@ export const StudentCard = ({
       </div>
 
       <div className="student-card-section">
-        <h4 className="section-title">カリキュラム</h4>
+        <SectionTitle>カリキュラム</SectionTitle>
         <div className="curriculum-badges">
           {curriculum ? (
             <span className="curriculum-badge">
@@ -49,7 +50,7 @@ export const StudentCard = ({
       </div>
 
       <div className="student-card-section">
-        <h4 className="section-title">授業時間</h4>
+        <SectionTitle>授業時間</SectionTitle>
         <div className="schedule-time">
           <span className="time-icon">
             <ClockIcon size={20} />
@@ -59,7 +60,7 @@ export const StudentCard = ({
       </div>
 
       <div className="student-card-section">
-        <h4 className="section-title">メモ</h4>
+        <SectionTitle>メモ</SectionTitle>
         <div className="memo-area">
           <textarea
             className="memo-input"
