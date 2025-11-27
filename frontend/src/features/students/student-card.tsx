@@ -1,8 +1,8 @@
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
-import "./StudentCard.css";
+import "./student-card.css";
 
-import { Button } from "../ui/button";
-import { BookIcon, ClockIcon } from "../ui/icons";
+import { Button } from "../../components/ui/button";
+import { BookIcon, ClockIcon } from "../../components/ui/icons";
 
 interface StudentCardProps {
   student: Student;
@@ -81,3 +81,4 @@ export const StudentCard = ({
     </div>
   );
 };
+

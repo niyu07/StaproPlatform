@@ -1,4 +1,5 @@
-import "./UserProfile.css";
+import { Avatar, AvatarFallback } from "./avatar";
+import "./user-profile.css";
 
 interface UserProfileProps {
   name: string;
@@ -7,13 +8,14 @@ interface UserProfileProps {
 }
 
 export const UserProfile = ({ name, role, avatarLabel }: UserProfileProps) => {
-  // Use first character of name if avatarLabel is not provided
   const displayAvatar = avatarLabel || name.charAt(0);
 
   return (
     <div className="user-profile-area">
       <div className="user-info">
-        <div className="avatar">{displayAvatar}</div>
+        <Avatar>
+          <AvatarFallback>{displayAvatar}</AvatarFallback>
+        </Avatar>
         <div className="user-details">
           <span className="username">{name}</span>
           <span className="user-role">{role}</span>
@@ -22,3 +24,4 @@ export const UserProfile = ({ name, role, avatarLabel }: UserProfileProps) => {
     </div>
   );
 };
+

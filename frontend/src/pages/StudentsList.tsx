@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { Student } from "../types/database";
-import { StudentCard } from "../components/StudentCard/StudentCard";
-import { SearchBar } from "../components/SearchBar/SearchBar";
-import { StudentEditModal } from "../components/StudentEditModal/StudentEditModal";
+import { StudentCard } from "../features/students/student-card";
+import { SearchBar } from "../components/ui/search-bar";
+import { StudentEditModal } from "../features/students/student-edit-modal";
 import {
   mockStudents as initialMockStudents,
   mockCurriculums,

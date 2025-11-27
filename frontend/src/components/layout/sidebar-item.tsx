@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import "./SidebarItem.css";
+import "./sidebar-item.css";
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -19,3 +19,4 @@ export const SidebarItem = ({ icon: Icon, label, path }: SidebarItemProps) => {
     </NavLink>
   );
 };
+

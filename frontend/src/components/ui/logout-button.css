@@ -1,0 +1,9 @@
+.logout-btn {
+  color: hsl(var(--destructive));
+}
+
+.logout-btn:hover {
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+}
+

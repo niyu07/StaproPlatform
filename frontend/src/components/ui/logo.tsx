@@ -1,4 +1,4 @@
-import "./Logo.css";
+import "./logo.css";
 
 export const Logo = () => {
   return (
@@ -8,3 +8,4 @@ export const Logo = () => {
     </div>
   );
 };
+

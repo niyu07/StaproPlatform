@@ -1,9 +1,9 @@
 import { LayoutGrid, Calendar, Users, BookOpen, Settings } from "lucide-react";
-import { SidebarItem } from "../SidebarItem/SidebarItem";
-import { Logo } from "../Logo/Logo";
-import { UserProfile } from "../UserProfile/UserProfile";
-import { LogoutButton } from "../LogoutButton/LogoutButton";
-import "./Sidebar.css";
+import { SidebarItem } from "./sidebar-item";
+import { Logo } from "../ui/logo";
+import { UserProfile } from "../ui/user-profile";
+import { LogoutButton } from "../ui/logout-button";
+import "./sidebar.css";
 
 export const Sidebar = () => {
   const navItems = [
@@ -38,3 +38,4 @@ export const Sidebar = () => {
     </aside>
   );
 };
+

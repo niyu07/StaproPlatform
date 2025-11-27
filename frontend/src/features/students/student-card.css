@@ -1,9 +1,9 @@
 .student-card {
-  background: #ffffff;
+  background: hsl(var(--card));
   border-radius: 16px;
   padding: 24px;
   box-shadow: none;
-  border: 1px solid #f0f0f0;
+  border: 1px solid hsl(var(--border));
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -11,7 +11,7 @@
 }
 
 .student-card:hover {
-  border-color: #e0e0e0;
+  border-color: hsl(var(--border));
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -24,14 +24,14 @@
 .student-name {
   font-size: 20px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
   margin: 0;
 }
 
 .student-grade {
   width: 24px;
   height: 4px;
-  background-color: #f0f0f0;
+  background-color: hsl(var(--muted));
   border-radius: 2px;
   margin-top: 4px;
 }
@@ -45,7 +45,7 @@
 .section-title {
   font-size: 16px;
   font-weight: 500;
-  color: #555;
+  color: hsl(var(--muted-foreground));
   margin: 0;
 }
 
@@ -60,8 +60,8 @@
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: #e6f0ff;
-  color: #0056b3;
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
@@ -71,7 +71,7 @@
   font-size: 16px;
   display: flex;
   align-items: center;
-  color: #0056b3;
+  color: hsl(var(--primary));
 }
 
 .schedule-time {
@@ -84,13 +84,13 @@
   font-size: 20px;
   display: flex;
   align-items: center;
-  color: #999;
+  color: hsl(var(--muted-foreground));
 }
 
 .time-text {
   font-size: 18px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
 }
 
 .memo-area {
@@ -100,21 +100,22 @@
 .memo-input {
   width: 100%;
   padding: 16px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   resize: none;
-  background: #fafafa;
-  color: #333;
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
 }
 
 .memo-input:focus {
   outline: none;
-  border-color: #e0e0e0;
-  background: white;
+  border-color: hsl(var(--ring));
+  background: hsl(var(--background));
 }
 
 .memo-input::placeholder {
-  color: #999;
+  color: hsl(var(--muted-foreground));
 }
+
