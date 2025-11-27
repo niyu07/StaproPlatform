@@ -1,9 +1,9 @@
 import type { Student, CurriculumMaster, Schedule } from "../../types/database";
-import "./student-card.css";
 
 import { Button } from "../../components/ui/button";
 import { BookIcon, ClockIcon } from "../../components/ui/icons";
 import { SectionTitle } from "../../components/ui/section-title";
+import { cn } from "@/lib/utils";
 
 interface StudentCardProps {
   student: Student;
@@ -28,42 +28,51 @@ export const StudentCard = ({
   };
 
   return (
-    <div className="student-card">
-      <div className="student-card-header">
-        <h3 className="student-name">{student.name}</h3>
+    <div className="bg-card rounded-2xl p-6 border border-border flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-xl font-semibold text-foreground m-0">
+          {student.name}
+        </h3>
       </div>
 
-      <div className="student-card-section">
+      <div className="flex flex-col gap-3">
         <SectionTitle>カリキュラム</SectionTitle>
-        <div className="curriculum-badges">
+        <div className="flex flex-wrap gap-2">
           {curriculum ? (
-            <span className="curriculum-badge">
-              <span className="badge-icon">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold">
+              <span className="text-base flex items-center text-primary">
                 <BookIcon size={14} />
               </span>
               {curriculum.name}
             </span>
           ) : (
-            <span className="no-curriculum">未設定</span>
+            <span className="text-muted-foreground">未設定</span>
           )}
         </div>
       </div>
 
-      <div className="student-card-section">
+      <div className="flex flex-col gap-3">
         <SectionTitle>授業時間</SectionTitle>
-        <div className="schedule-time">
-          <span className="time-icon">
+        <div className="flex items-center gap-3">
+          <span className="text-xl flex items-center text-muted-foreground">
             <ClockIcon size={20} />
           </span>
-          <span className="time-text">{formatScheduleTime(nextSchedule)}</span>
+          <span className="text-lg font-medium text-foreground">
+            {formatScheduleTime(nextSchedule)}
+          </span>
         </div>
       </div>
 
-      <div className="student-card-section">
+      <div className="flex flex-col gap-3">
         <SectionTitle>メモ</SectionTitle>
-        <div className="memo-area">
+        <div className="w-full">
           <textarea
-            className="memo-input"
+            className={cn(
+              "w-full p-4 border border-border rounded-lg text-sm font-inherit resize-none",
+              "bg-muted text-foreground",
+              "focus:outline-none focus:border-ring focus:bg-background",
+              "placeholder:text-muted-foreground",
+            )}
             placeholder="メモ"
             rows={3}
             value={student.memo || ""}

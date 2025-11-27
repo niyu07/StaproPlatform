@@ -10,11 +10,10 @@ export const SectionTitle = ({ children, className }: SectionTitleProps) => {
     <h4
       className={cn(
         "text-base font-medium text-muted-foreground m-0",
-        className
+        className,
       )}
     >
       {children}
     </h4>
   );
 };
-
