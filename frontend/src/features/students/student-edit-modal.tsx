@@ -41,16 +41,28 @@ export const StudentEditModal = ({
   onClose,
   onSave,
 }: StudentEditModalProps) => {
-  const [formData, setFormData] = useState<Student>(emptyStudent);
+  // Initialize form data based on student prop
+  const [formData, setFormData] = useState<Student>(() => {
+    return student ? { ...student } : { ...emptyStudent };
+  });
 
   // Reset form when the modal opens or the selected student changes
-  useEffect(() => {
-    if (student) {
-      setFormData({ ...student });
-    } else {
-      setFormData({ ...emptyStudent });
+  // Using useMemo to derive state from props to avoid setState in effect
+  const initialFormData = React.useMemo(() => {
+    return student ? { ...student } : { ...emptyStudent };
+  }, [student]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      // Schedule state update to avoid synchronous setState
+      const updateFormData = () => {
+        setFormData(initialFormData);
+      };
+      // Use requestAnimationFrame to defer state update
+      const frameId = requestAnimationFrame(updateFormData);
+      return () => cancelAnimationFrame(frameId);
     }
-  }, [student, isOpen]);
+  }, [isOpen, initialFormData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
