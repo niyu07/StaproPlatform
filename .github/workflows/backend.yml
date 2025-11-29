@@ -48,11 +48,12 @@ jobs:
         working-directory: backend
 
       - name: Lint
-        uses: reviewdog/action-golangci-lint@v2
+        uses: reviewdog/action-golangci-lint@v4
         with:
           workdir: backend
           level: warning
           golangci_lint_flags: "--timeout=5m"
+          golangci_lint_version: "v1.64.8"
 
       - name: Build
         run: go build .
