@@ -1,5 +1,5 @@
 # Go公式イメージ（最新版を推奨）
-FROM golang:latest
+FROM golang:1.21
 
 WORKDIR /app
 
