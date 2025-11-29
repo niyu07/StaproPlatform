@@ -53,14 +53,6 @@ jobs:
           golangci-lint run --timeout=5m
         working-directory: backend
 
-      - name: Run reviewdog
-        uses: reviewdog/action-reviewdog@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          level: warning
-          filter_mode: nofilter
-
       - name: Build
         run: go build .
         working-directory: backend
