@@ -9,68 +9,6 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-// 構造体定義
-type School struct {
-    ID   int    `json:"id"`
-    Name string `json:"name"`
-}
-
-type Mentor struct {
-    ID   int    `json:"id"`
-    Name string `json:"name"`
-}
-
-type CurriculumMaster struct {
-    ID   int    `json:"id"`
-    Name string `json:"name"`
-}
-
-type Student struct {
-    UserID int    `json:"user_id"`
-    Name   string `json:"name"`
-    Grade  string `json:"grade"`
-    Email  string `json:"email"`
-    Status string `json:"status"`
-}
-
-type Curriculum struct {
-    ID           int `json:"id"`
-    UserID       int `json:"user_id"`
-    CurriculumID int `json:"curriculum_id"`
-    Lessons      int `json:"lessons"`
-}
-
-type Schedule struct {
-    ID        int    `json:"id"`
-    SchoolID  int    `json:"school_id"`
-    Title     string `json:"title"`
-    MentorID  int    `json:"mentor_id"`
-    UserID    int    `json:"user_id"`
-    StartTime string `json:"start_time"`
-    EndTime   string `json:"end_time"`
-}
-
-type CurriculumLesson struct {
-    ID           int    `json:"id"`
-    CurriculumID int    `json:"curriculum_id"`
-    Name         string `json:"name"`
-    Description  string `json:"description"`
-    PageRange    string `json:"page_range"`
-    DisplayOrder int    `json:"display_order"`
-}
-
-type StudentLessonProgress struct {
-    ID                int    `json:"id"`
-    UserID            int    `json:"user_id"`
-    LessonID          int    `json:"lesson_id"`
-    Status            string `json:"status"`
-    NextPage          string `json:"next_page"`
-    InstructorComment string `json:"instructor_comment"`
-    CompletedAt       string `json:"completed_at"`
-    CreatedAt         string `json:"created_at"`
-    UpdatedAt         string `json:"updated_at"`
-}
-
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
     url := os.Getenv("SUPABASE_URL") + "/rest/v1/" + tableName + "?select=*"
