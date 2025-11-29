@@ -1,3 +1,4 @@
+// Package main provides the backend API server for the Stapro Platform.
 package main
 
 import (
@@ -27,7 +28,11 @@ func fetchFromSupabase(tableName string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("failed to close response body: %v", err)
+		}
+	}()
 
 	return io.ReadAll(resp.Body)
 }
@@ -49,7 +54,11 @@ func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("failed to close response body: %v", err)
+		}
+	}()
 
 	return io.ReadAll(resp.Body)
 }
