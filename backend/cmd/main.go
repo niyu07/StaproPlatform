@@ -9,16 +9,77 @@ import (
     "github.com/gin-gonic/gin"
 )
 
+// 構造体定義
 type School struct {
     ID   int    `json:"id"`
     Name string `json:"name"`
 }
 
-func getSchools() ([]School, error) {
-    url := os.Getenv("SUPABASE_URL") + "/rest/v1/school?select=*"
+type Mentor struct {
+    ID   int    `json:"id"`
+    Name string `json:"name"`
+}
+
+type CurriculumMaster struct {
+    ID   int    `json:"id"`
+    Name string `json:"name"`
+}
+
+type Student struct {
+    UserID int    `json:"user_id"`
+    Name   string `json:"name"`
+    Grade  string `json:"grade"`
+    Email  string `json:"email"`
+    Status string `json:"status"`
+}
+
+type Curriculum struct {
+    ID           int `json:"id"`
+    UserID       int `json:"user_id"`
+    CurriculumID int `json:"curriculum_id"`
+    Lessons      int `json:"lessons"`
+}
+
+type Schedule struct {
+    ID        int    `json:"id"`
+    SchoolID  int    `json:"school_id"`
+    Title     string `json:"title"`
+    MentorID  int    `json:"mentor_id"`
+    UserID    int    `json:"user_id"`
+    StartTime string `json:"start_time"`
+    EndTime   string `json:"end_time"`
+}
+
+type CurriculumLesson struct {
+    ID           int    `json:"id"`
+    CurriculumID int    `json:"curriculum_id"`
+    Name         string `json:"name"`
+    Description  string `json:"description"`
+    PageRange    string `json:"page_range"`
+    DisplayOrder int    `json:"display_order"`
+}
+
+type StudentLessonProgress struct {
+    ID                int    `json:"id"`
+    UserID            int    `json:"user_id"`
+    LessonID          int    `json:"lesson_id"`
+    Status            string `json:"status"`
+    NextPage          string `json:"next_page"`
+    InstructorComment string `json:"instructor_comment"`
+    CompletedAt       string `json:"completed_at"`
+    CreatedAt         string `json:"created_at"`
+    UpdatedAt         string `json:"updated_at"`
+}
+
+// 汎用的なSupabaseデータ取得関数
+func fetchFromSupabase(tableName string) ([]byte, error) {
+    url := os.Getenv("SUPABASE_URL") + "/rest/v1/" + tableName + "?select=*"
     apiKey := os.Getenv("SUPABASE_API_KEY")
 
-    req, _ := http.NewRequest("GET", url, nil)
+    req, err := http.NewRequest("GET", url, nil)
+    if err != nil {
+        return nil, err
+    }
     req.Header.Set("apikey", apiKey)
     req.Header.Set("Authorization", "Bearer "+apiKey)
 
@@ -29,22 +90,128 @@ func getSchools() ([]School, error) {
     }
     defer resp.Body.Close()
 
-    body, _ := io.ReadAll(resp.Body)
-    var schools []School
-    json.Unmarshal(body, &schools)
-    return schools, nil
+    return io.ReadAll(resp.Body)
+}
+
+// ソート付きでSupabaseデータ取得
+func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error) {
+    url := os.Getenv("SUPABASE_URL") + "/rest/v1/" + tableName + "?select=*&order=" + orderBy
+    apiKey := os.Getenv("SUPABASE_API_KEY")
+
+    req, err := http.NewRequest("GET", url, nil)
+    if err != nil {
+        return nil, err
+    }
+    req.Header.Set("apikey", apiKey)
+    req.Header.Set("Authorization", "Bearer "+apiKey)
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    return io.ReadAll(resp.Body)
 }
 
 func main() {
     r := gin.Default()
 
+    // 校舎一覧
     r.GET("/api/school", func(c *gin.Context) {
-        schools, err := getSchools()
+        body, err := fetchFromSupabase("school")
         if err != nil {
             c.JSON(500, gin.H{"error": "取得失敗"})
             return
         }
-        c.JSON(200, schools)
+        var data []School
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // メンター一覧
+    r.GET("/api/mentor", func(c *gin.Context) {
+        body, err := fetchFromSupabase("mentor")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []Mentor
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // カリキュラムマスター一覧
+    r.GET("/api/curriculummaster", func(c *gin.Context) {
+        body, err := fetchFromSupabase("curriculummaster")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []CurriculumMaster
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // 生徒一覧
+    r.GET("/api/student", func(c *gin.Context) {
+        body, err := fetchFromSupabase("student")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []Student
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // カリキュラム進行一覧
+    r.GET("/api/curriculum", func(c *gin.Context) {
+        body, err := fetchFromSupabase("curriculum")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []Curriculum
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // スケジュール一覧
+    r.GET("/api/schedule", func(c *gin.Context) {
+        body, err := fetchFromSupabase("schedule")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []Schedule
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // カリキュラムレッスン一覧（curriculum_id, display_order順）
+    r.GET("/api/curriculumlesson", func(c *gin.Context) {
+        body, err := fetchFromSupabaseWithOrder("curriculumlesson", "curriculum_id,display_order")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []CurriculumLesson
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
+    })
+
+    // 生徒レッスン進捗一覧（user_id, lesson_id順）
+    r.GET("/api/studentlessonprogress", func(c *gin.Context) {
+        body, err := fetchFromSupabaseWithOrder("studentlessonprogress", "user_id,lesson_id")
+        if err != nil {
+            c.JSON(500, gin.H{"error": "取得失敗"})
+            return
+        }
+        var data []StudentLessonProgress
+        json.Unmarshal(body, &data)
+        c.JSON(200, data)
     })
 
     r.Run() // :8080 で起動
