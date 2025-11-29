@@ -16,3 +16,4 @@ main
 .DS_Store
 
 # その他
+.env
