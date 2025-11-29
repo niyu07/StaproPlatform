@@ -48,7 +48,7 @@ jobs:
         working-directory: backend
 
       - name: Lint
-        uses: reviewdog/action-golangci-lint@v4
+        uses: reviewdog/action-golangci-lint@v3
         with:
           workdir: backend
           level: warning
