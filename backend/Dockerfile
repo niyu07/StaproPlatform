@@ -17,4 +17,4 @@ RUN go mod tidy
 EXPOSE 8080
 
 # サーバー起動
-CMD ["go", "run", "./cmd/main.go"]
+CMD ["go", "run", "main.go"]

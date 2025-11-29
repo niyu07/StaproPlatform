@@ -62,7 +62,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: Build
-        run: go build ./cmd
+        run: go build .
         working-directory: backend
 
       - name: Test
