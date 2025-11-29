@@ -48,12 +48,18 @@ jobs:
         working-directory: backend
 
       - name: Lint
-        uses: reviewdog/action-golangci-lint@v3
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.8
+          golangci-lint run --timeout=5m
+        working-directory: backend
+
+      - name: Run reviewdog
+        uses: reviewdog/action-reviewdog@v1
         with:
-          workdir: backend
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
           level: warning
-          golangci_lint_flags: "--timeout=5m"
-          golangci_lint_version: "v1.64.8"
+          filter_mode: nofilter
 
       - name: Build
         run: go build .
