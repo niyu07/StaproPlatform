@@ -1,0 +1,70 @@
+name: Backend CI / CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    paths:
+      - "backend/**"
+
+jobs:
+  ci:
+    name: CI (lint / format / build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+        working-directory: backend
+
+      - name: Tidy modules
+        run: go mod tidy
+        working-directory: backend
+
+      - name: Format check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+            echo "The following files are not formatted:"
+            gofmt -s -l .
+            exit 1
+          fi
+        working-directory: backend
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+          working-directory: backend
+          args: --timeout=5m --out-format=line-number
+
+      - name: Run golangci-lint with reviewdog
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          workdir: backend
+          level: warning
+        if: github.event_name == 'pull_request'
+
+      - name: Build
+        run: go build ./cmd
+        working-directory: backend
+
+      - name: Test
+        run: go test ./...
+        working-directory: backend
