@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -64,7 +65,10 @@ func main() {
 			return
 		}
 		var data []School
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -76,7 +80,10 @@ func main() {
 			return
 		}
 		var data []Mentor
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -88,7 +95,10 @@ func main() {
 			return
 		}
 		var data []CurriculumMaster
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -100,7 +110,10 @@ func main() {
 			return
 		}
 		var data []Student
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -112,7 +125,10 @@ func main() {
 			return
 		}
 		var data []Curriculum
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -124,7 +140,10 @@ func main() {
 			return
 		}
 		var data []Schedule
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -136,7 +155,10 @@ func main() {
 			return
 		}
 		var data []CurriculumLesson
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
@@ -148,9 +170,14 @@ func main() {
 			return
 		}
 		var data []StudentLessonProgress
-		json.Unmarshal(body, &data)
+		if err := json.Unmarshal(body, &data); err != nil {
+			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			return
+		}
 		c.JSON(200, data)
 	})
 
-	r.Run() // :8080 で起動
+	if err := r.Run(); err != nil {
+		log.Fatal("サーバー起動失敗:", err)
+	}
 }
