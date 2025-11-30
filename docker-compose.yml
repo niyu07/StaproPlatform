@@ -3,7 +3,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    
+
     volumes:
       - ./frontend:/frontend
       - /frontend/node_modules
@@ -12,6 +12,28 @@ services:
 
     ports:
       - "5173:5173"
+
+    stdin_open: true
+    tty: true
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    volumes:
+      - ./backend:/app
+
+    command: go run main.go
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      - TZ=Asia/Tokyo
+
+    env_file:
+      - ./backend/.env
 
     stdin_open: true
     tty: true

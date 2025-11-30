@@ -1,0 +1,19 @@
+# Go build
+main
+*.exe
+*.out
+*.o
+
+# Go modules
+/go.sum
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# その他
+.env
