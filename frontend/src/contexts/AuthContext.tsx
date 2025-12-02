@@ -23,7 +23,7 @@ interface AuthContextValue {
   logout: () => Promise<void>;
 }
 
-const STORAGE_KEY = "stapro_auth_user";
+const storageKey = "stapro_auth_user";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -51,11 +51,11 @@ const API_BASE_URL = resolveApiBaseUrl();
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(storageKey);
       if (!stored) return null;
       return JSON.parse(stored) as User;
     } catch {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey);
       return null;
     }
   });
@@ -72,7 +72,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json().catch(() => null);
+      const data = await response.json().catch((err) => {
+        console.error("ログイン応答JSONの解析に失敗しました", err);
+        return null;
+      });
 
       if (
         !response.ok ||
@@ -92,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: data.role,
       };
       setUser(userData);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+      localStorage.setItem(storageKey, JSON.stringify(userData));
       return { success: true };
     } catch (error) {
       console.error("Failed to login", error);
@@ -102,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey);
     try {
       await fetch(`${API_BASE_URL}/api/logout`, { method: "POST" });
     } catch (error) {
