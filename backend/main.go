@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"strings"
 	"time"
@@ -43,7 +44,11 @@ var staticUsers = map[string]loginUser{
 	},
 }
 
-const loginErrorMessage = "メールアドレスまたはパスワードが正しくありません"
+const (
+	loginErrorMessage = "メールアドレスまたはパスワードが正しくありません"
+	maxEmailLength    = 254
+	maxPasswordLength = 72
+)
 
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
@@ -260,9 +265,25 @@ func handleLogin(c *gin.Context) {
 		return
 	}
 
-	email := strings.ToLower(strings.TrimSpace(req.Email))
+	emailRaw := strings.TrimSpace(req.Email)
+	if emailRaw == "" || len(emailRaw) > maxEmailLength {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+	if _, err := mail.ParseAddress(emailRaw); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	password := req.Password
+	if strings.TrimSpace(password) == "" || len(password) > maxPasswordLength {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	email := strings.ToLower(emailRaw)
 	user, ok := staticUsers[email]
-	if !ok || user.Password != req.Password {
+	if !ok || user.Password != password {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": loginErrorMessage})
 		return
 	}
