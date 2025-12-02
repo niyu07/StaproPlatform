@@ -22,14 +22,12 @@ type TestUser = {
 
 const createTestUsers = (): TestUser[] => {
   try {
+    const isDev = import.meta.env?.DEV === true;
     const enableFromEnv =
-      ((
-        import.meta as ImportMeta & {
-          readonly env?: Record<string, string | undefined>;
-        }
-      ).env?.VITE_ENABLE_TEST_USERS?.toLowerCase() || "false") === "true";
+      (import.meta.env?.VITE_ENABLE_TEST_USERS?.toLowerCase() || "false") ===
+      "true";
 
-    if (!(import.meta.env.DEV || enableFromEnv)) {
+    if (!(isDev || enableFromEnv)) {
       return [];
     }
   } catch {
