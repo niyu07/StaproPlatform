@@ -189,7 +189,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	loginLimiter := newIPRateLimiter(loginRateLimitMaxRequests, time.Minute)
+	loginLimiter := newIPRateLimiter(loginRateLimitMaxRequests, loginRateLimitWindow)
 	r.POST("/api/login", rateLimitMiddleware(loginLimiter), handleLogin)
 	r.POST("/api/logout", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"success": true})

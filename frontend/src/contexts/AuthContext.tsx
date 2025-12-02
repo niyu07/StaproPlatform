@@ -18,7 +18,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
 }
