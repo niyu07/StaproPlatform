@@ -24,7 +24,7 @@ services:
     volumes:
       - ./backend:/app
 
-    command: go run main.go
+    command: go run .
 
     ports:
       - "8080:8080"
