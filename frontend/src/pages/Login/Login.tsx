@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Input } from "../../components/ui/input";
@@ -14,15 +14,40 @@ import {
 import { AlertCircle, Loader2 } from "lucide-react";
 import "./Login.css";
 
-const testUsers = [
-  { email: "admin@example.com", password: "admin123", label: "管理者" },
-  { email: "teacher@example.com", password: "teacher123", label: "講師" },
-  { email: "student@example.com", password: "student123", label: "生徒" },
-];
+type TestUser = {
+  email: string;
+  password: string;
+  label: string;
+};
+
+const createTestUsers = (): TestUser[] => {
+  try {
+    const enableFromEnv =
+      ((
+        import.meta as ImportMeta & {
+          readonly env?: Record<string, string | undefined>;
+        }
+      ).env?.VITE_ENABLE_TEST_USERS?.toLowerCase() || "false") === "true";
+
+    if (!(import.meta.env.DEV || enableFromEnv)) {
+      return [];
+    }
+  } catch {
+    return [];
+  }
+
+  return [
+    { email: "admin@example.com", password: "admin123", label: "管理者" },
+    { email: "teacher@example.com", password: "teacher123", label: "講師" },
+    { email: "student@example.com", password: "student123", label: "生徒" },
+  ];
+};
 
 export const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
+  const testUsers = useMemo(() => createTestUsers(), []);
+  const testUsersAvailable = testUsers.length > 0;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -95,9 +120,13 @@ export const Login = () => {
                 <AlertCircle className="error-icon" />
                 <p>{error}</p>
               </div>
-            ) : (
+            ) : testUsersAvailable ? (
               <p className="hint-text">
                 テストユーザーを選択すると自動入力されます。
+              </p>
+            ) : (
+              <p className="hint-text">
+                登録済みの認証情報を入力してログインしてください。
               </p>
             )}
 
@@ -117,24 +146,24 @@ export const Login = () => {
             </Button>
           </form>
 
-          <div className="test-users">
-            <p className="test-users-title">テストユーザー</p>
-            <div className="test-user-buttons">
-              {testUsers.map((user) => (
-                <button
-                  key={user.email}
-                  type="button"
-                  className="test-user-chip"
-                  onClick={() => fillTestUser(user.email, user.password)}
-                >
-                  <span className="chip-label">{user.label}</span>
-                  <span className="chip-credentials">
-                    {user.email} / {user.password}
-                  </span>
-                </button>
-              ))}
+          {testUsersAvailable ? (
+            <div className="test-users">
+              <p className="test-users-title">テストユーザー（開発環境のみ）</p>
+              <div className="test-user-buttons">
+                {testUsers.map((user) => (
+                  <button
+                    key={user.email}
+                    type="button"
+                    className="test-user-chip"
+                    onClick={() => fillTestUser(user.email, user.password)}
+                  >
+                    <span className="chip-label">{user.label}</span>
+                    <span className="chip-credentials">自動入力</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>

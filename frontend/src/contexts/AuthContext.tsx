@@ -25,40 +25,86 @@ interface AuthContextValue {
 
 const storageKey = "stapro_auth_user";
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-const resolveApiBaseUrl = () => {
+const readEnvValue = (key: string): string | undefined => {
   try {
-    const envValue = (
+    const env = (
       import.meta as ImportMeta & {
         readonly env?: Record<string, string | undefined>;
       }
-    ).env?.VITE_API_BASE_URL;
-    if (envValue && envValue.trim() !== "") {
-      return envValue.replace(/\/$/, "");
-    }
+    ).env;
+    return env?.[key]?.trim() || undefined;
   } catch {
-    // ignore when running outside the browser (tests, etc.)
+    return undefined;
   }
+};
+
+const getSessionStorage = (): Storage | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  try {
+    return window.sessionStorage;
+  } catch (error) {
+    console.warn("Failed to access sessionStorage", error);
+    return null;
+  }
+};
+
+const readStoredUser = (): User | null => {
+  const storage = getSessionStorage();
+  if (!storage) return null;
+  try {
+    const stored = storage.getItem(storageKey);
+    if (!stored) return null;
+    return JSON.parse(stored) as User;
+  } catch (error) {
+    console.warn("Failed to parse stored user", error);
+    storage.removeItem(storageKey);
+    return null;
+  }
+};
+
+const persistUser = (userData: User) => {
+  const storage = getSessionStorage();
+  if (!storage) return;
+  try {
+    storage.setItem(storageKey, JSON.stringify(userData));
+  } catch (error) {
+    console.warn("Failed to persist user", error);
+  }
+};
+
+const clearStoredUser = () => {
+  const storage = getSessionStorage();
+  if (!storage) return;
+  storage.removeItem(storageKey);
+};
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+const resolveApiBaseUrl = () => {
+  const envBaseUrl = readEnvValue("VITE_API_BASE_URL");
+  if (envBaseUrl) {
+    return envBaseUrl.replace(/\/$/, "");
+  }
+
   if (typeof window !== "undefined") {
-    return `${window.location.protocol}//${window.location.hostname}:8080`;
+    const { protocol, hostname } = window.location;
+    const envPort = readEnvValue("VITE_API_PORT");
+    const shouldUseDevPort =
+      !envPort && (hostname === "localhost" || hostname === "127.0.0.1");
+    const port = envPort || (shouldUseDevPort ? "8080" : "");
+    const portSegment = port ? `:${port}` : "";
+    return `${protocol}//${hostname}${portSegment}`.replace(/:(80|443)$/, "");
   }
+
   return "http://localhost:8080";
 };
 
 const API_BASE_URL = resolveApiBaseUrl();
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (!stored) return null;
-      return JSON.parse(stored) as User;
-    } catch {
-      localStorage.removeItem(storageKey);
-      return null;
-    }
-  });
+  const [user, setUser] = useState<User | null>(() => readStoredUser());
 
   const isLoading = false;
 
@@ -95,7 +141,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: data.role,
       };
       setUser(userData);
-      localStorage.setItem(storageKey, JSON.stringify(userData));
+      persistUser(userData);
       return { success: true };
     } catch (error) {
       console.error("Failed to login", error);
@@ -105,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     setUser(null);
-    localStorage.removeItem(storageKey);
+    clearStoredUser();
     try {
       await fetch(`${API_BASE_URL}/api/logout`, { method: "POST" });
     } catch (error) {
