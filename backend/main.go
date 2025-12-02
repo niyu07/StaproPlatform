@@ -7,9 +7,43 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
+
+type loginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type loginUser struct {
+	Name     string
+	Role     string
+	Password string
+}
+
+var staticUsers = map[string]loginUser{
+	"admin@example.com": {
+		Name:     "管理者ユーザー",
+		Role:     "admin",
+		Password: "admin123",
+	},
+	"teacher@example.com": {
+		Name:     "講師ユーザー",
+		Role:     "teacher",
+		Password: "teacher123",
+	},
+	"student@example.com": {
+		Name:     "生徒ユーザー",
+		Role:     "student",
+		Password: "student123",
+	},
+}
+
+const loginErrorMessage = "メールアドレスまたはパスワードが正しくありません"
 
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
@@ -63,8 +97,36 @@ func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error
 	return io.ReadAll(resp.Body)
 }
 
+func resolveAllowedOrigins() []string {
+	origins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
+	var cleaned []string
+	for _, origin := range origins {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			cleaned = append(cleaned, trimmed)
+		}
+	}
+	if len(cleaned) == 0 {
+		return []string{"http://localhost:5173"}
+	}
+	return cleaned
+}
+
 func main() {
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     resolveAllowedOrigins(),
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.POST("/api/login", handleLogin)
+	r.POST("/api/logout", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"success": true})
+	})
 
 	// 校舎一覧
 	r.GET("/api/school", func(c *gin.Context) {
@@ -189,4 +251,26 @@ func main() {
 	if err := r.Run(); err != nil {
 		log.Fatal("サーバー起動失敗:", err)
 	}
+}
+
+func handleLogin(c *gin.Context) {
+	var req loginRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	email := strings.ToLower(strings.TrimSpace(req.Email))
+	user, ok := staticUsers[email]
+	if !ok || user.Password != req.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"email":   email,
+		"name":    user.Name,
+		"role":    user.Role,
+	})
 }
