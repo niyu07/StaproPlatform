@@ -53,9 +53,8 @@ const (
 	maxEmailLength             = 254
 	maxPasswordLength          = 72
 	loginRateLimitMaxRequests  = 5
+	loginRateLimitWindow       = time.Minute
 )
-
-var loginRateLimitWindow = time.Minute
 
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
