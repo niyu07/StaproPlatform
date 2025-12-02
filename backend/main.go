@@ -9,10 +9,13 @@ import (
 	"net/mail"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/time/rate"
 )
 
 type loginRequest struct {
@@ -21,34 +24,38 @@ type loginRequest struct {
 }
 
 type loginUser struct {
-	Name     string
-	Role     string
-	Password string
+	Name         string
+	Role         string
+	PasswordHash string
 }
 
 var staticUsers = map[string]loginUser{
 	"admin@example.com": {
-		Name:     "管理者ユーザー",
-		Role:     "admin",
-		Password: "admin123",
+		Name:         "管理者ユーザー",
+		Role:         "admin",
+		PasswordHash: "$2a$10$p5MmKREkYC.6ohwGEMfWKep/PcmauP3hYne/4QfUyw/HGcJe7UzO.",
 	},
 	"teacher@example.com": {
-		Name:     "講師ユーザー",
-		Role:     "teacher",
-		Password: "teacher123",
+		Name:         "講師ユーザー",
+		Role:         "teacher",
+		PasswordHash: "$2a$10$egofAWeF49PluFLJTITz2eTfTVSEUClpJ2NdoD2aO8.SFzZJCI1yS",
 	},
 	"student@example.com": {
-		Name:     "生徒ユーザー",
-		Role:     "student",
-		Password: "student123",
+		Name:         "生徒ユーザー",
+		Role:         "student",
+		PasswordHash: "$2a$10$WhtQoePHVfNbo5RdgE.TauHlp8vXSHf2SOes2x4ngUiutEIo6mgLS",
 	},
 }
 
 const (
-	loginErrorMessage = "メールアドレスまたはパスワードが正しくありません"
-	maxEmailLength    = 254
-	maxPasswordLength = 72
+	loginErrorMessage          = "メールアドレスまたはパスワードが正しくありません"
+	loginRateLimitErrorMessage = "ログイン試行が多すぎます。しばらくしてから再度お試しください。"
+	maxEmailLength             = 254
+	maxPasswordLength          = 72
+	loginRateLimitMaxRequests  = 5
 )
+
+var loginRateLimitWindow = time.Minute
 
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
@@ -117,6 +124,60 @@ func resolveAllowedOrigins() []string {
 	return cleaned
 }
 
+type ipRateLimiter struct {
+	mu          sync.Mutex
+	clients     map[string]*rate.Limiter
+	maxRequests int
+	window      time.Duration
+}
+
+func newIPRateLimiter(maxRequests int, window time.Duration) *ipRateLimiter {
+	if maxRequests <= 0 {
+		maxRequests = 1
+	}
+	if window <= 0 {
+		window = time.Minute
+	}
+	return &ipRateLimiter{
+		clients:     make(map[string]*rate.Limiter),
+		maxRequests: maxRequests,
+		window:      window,
+	}
+}
+
+func (l *ipRateLimiter) getLimiter(ip string) *rate.Limiter {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	limiter, exists := l.clients[ip]
+	if !exists {
+		perRequest := l.window / time.Duration(l.maxRequests)
+		if perRequest <= 0 {
+			perRequest = time.Minute / time.Duration(l.maxRequests)
+		}
+		limiter = rate.NewLimiter(rate.Every(perRequest), l.maxRequests)
+		l.clients[ip] = limiter
+	}
+	return limiter
+}
+
+func (l *ipRateLimiter) allow(ip string) bool {
+	return l.getLimiter(ip).Allow()
+}
+
+func rateLimitMiddleware(l *ipRateLimiter) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !l.allow(c.ClientIP()) {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+				"success": false,
+				"message": loginRateLimitErrorMessage,
+			})
+			return
+		}
+		c.Next()
+	}
+}
+
 func main() {
 	r := gin.Default()
 
@@ -128,7 +189,8 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.POST("/api/login", handleLogin)
+	loginLimiter := newIPRateLimiter(loginRateLimitMaxRequests, time.Minute)
+	r.POST("/api/login", rateLimitMiddleware(loginLimiter), handleLogin)
 	r.POST("/api/logout", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"success": true})
 	})
@@ -283,7 +345,7 @@ func handleLogin(c *gin.Context) {
 
 	email := strings.ToLower(emailRaw)
 	user, ok := staticUsers[email]
-	if !ok || user.Password != password {
+	if !ok || bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": loginErrorMessage})
 		return
 	}
