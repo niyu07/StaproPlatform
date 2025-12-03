@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { X } from "lucide-react";
 import { Button } from "./button";
+import { useSidebarWidth } from "@/hooks/useSidebarWidth";
+import { cn } from "@/lib/utils";
 import type {
   ScheduleWithRelations,
   Mentor,
@@ -22,6 +24,12 @@ interface GroupedSchedule {
   schedules: ScheduleWithRelations[];
 }
 
+interface MentorGroup {
+  mentorId: number;
+  mentorName: string;
+  schedules: ScheduleWithRelations[];
+}
+
 export const CustomScheduleDetail = ({
   date,
   schedules,
@@ -30,6 +38,8 @@ export const CustomScheduleDetail = ({
   curriculums,
   onClose,
 }: CustomScheduleDetailProps) => {
+  const sidebarWidth = useSidebarWidth();
+  
   console.log("CustomScheduleDetail rendered with date:", date);
   console.log("Schedules count:", schedules.length);
   console.log("Mentors count:", mentors.length);
@@ -142,8 +152,23 @@ export const CustomScheduleDetail = ({
     return `${month}月${day}日（${dayOfWeek}）`;
   };
 
+  // サイドバーがある場合、モーダルを中央に配置するためのスタイル
+  const modalStyle = useMemo(() => {
+    if (sidebarWidth > 0) {
+      // サイドバーの幅を考慮して、モーダルを中央に配置
+      return {
+        left: `${sidebarWidth}px`,
+        width: `calc(100% - ${sidebarWidth}px)`,
+      };
+    }
+    return {};
+  }, [sidebarWidth]);
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto" 
+      style={modalStyle}
+    >
       <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col my-auto">
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-4 border-b">
@@ -160,46 +185,66 @@ export const CustomScheduleDetail = ({
               この日のスケジュールはありません
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {groupedSchedules.map((group) => (
-                <div key={group.hour} className="border-b pb-4 last:border-b-0">
-                  <h3 className="text-lg font-semibold mb-3">
+                <div 
+                  key={group.hour} 
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                >
+                  <h3 className="text-lg font-semibold mb-4">
                     {group.hour}時
                   </h3>
-                  <div className="space-y-4">
-                    {/* メンター名のヘッダー */}
-                    <div className="flex gap-4">
-                      {group.schedules.map((schedule, index) => {
-                        const mentorName = getMentorName(schedule.mentor_id);
-                        return (
-                          <div key={index} className="flex-1">
-                            <div className="font-semibold text-center pb-2 border-b">
-                              {mentorName}
+                  {(() => {
+                    // 先生ごとにグループ化
+                    const mentorMap = new Map<number, MentorGroup>();
+                    
+                    group.schedules.forEach((schedule) => {
+                      const mentorId = schedule.mentor_id;
+                      if (!mentorMap.has(mentorId)) {
+                        mentorMap.set(mentorId, {
+                          mentorId,
+                          mentorName: getMentorName(mentorId),
+                          schedules: [],
+                        });
+                      }
+                      mentorMap.get(mentorId)!.schedules.push(schedule);
+                    });
+
+                    const mentorGroups = Array.from(mentorMap.values());
+
+                    return (
+                      <div className="flex gap-2">
+                        {mentorGroups.map((mentorGroup, mentorIndex) => (
+                          <div 
+                            key={mentorIndex} 
+                            className="flex-1 border border-gray-300 rounded-md bg-white p-3"
+                          >
+                            {/* 先生名 */}
+                            <div className="text-center font-semibold pb-2 mb-2 border-b border-gray-200">
+                              {mentorGroup.mentorName}
+                            </div>
+                            {/* 生徒名とカリキュラム */}
+                            <div className="space-y-2">
+                              {mentorGroup.schedules.map((schedule, scheduleIndex) => {
+                                const studentName = schedule.student?.name || "未設定";
+                                
+                                return (
+                                  <div key={scheduleIndex} className="space-y-1">
+                                    <div className="font-medium text-sm">
+                                      {studentName}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      カリキュラム名（開発予定）
+                                    </div>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* 生徒名とカリキュラム */}
-                    <div className="flex gap-4">
-                      {group.schedules.map((schedule, index) => {
-                        const studentName = schedule.student?.name || "未設定";
-                        const curriculumName = getCurriculumName(schedule);
-
-                        return (
-                          <div key={index} className="flex-1 space-y-1">
-                            <div className="font-medium text-sm">
-                              {studentName}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {curriculumName}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
