@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -58,12 +59,22 @@ const (
 
 // 汎用的なSupabaseデータ取得関数
 func fetchFromSupabase(tableName string) ([]byte, error) {
-	url := os.Getenv("SUPABASE_URL") + "/rest/v1/" + tableName + "?select=*"
+	supabaseURL := os.Getenv("SUPABASE_URL")
 	apiKey := os.Getenv("SUPABASE_API_KEY")
+
+	if supabaseURL == "" {
+		return nil, fmt.Errorf("SUPABASE_URL environment variable is not set")
+	}
+	if apiKey == "" {
+		return nil, fmt.Errorf("SUPABASE_API_KEY environment variable is not set")
+	}
+
+	url := supabaseURL + "/rest/v1/" + tableName + "?select=*"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to create request: %v", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("apikey", apiKey)
 	req.Header.Set("Authorization", "Bearer "+apiKey)
@@ -71,25 +82,42 @@ func fetchFromSupabase(tableName string) ([]byte, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to execute request: %v", err)
+		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("failed to close response body: %v", err)
 		}
 	}()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+	}
 
 	return io.ReadAll(resp.Body)
 }
 
 // ソート付きでSupabaseデータ取得
 func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error) {
-	url := os.Getenv("SUPABASE_URL") + "/rest/v1/" + tableName + "?select=*&order=" + orderBy
+	supabaseURL := os.Getenv("SUPABASE_URL")
 	apiKey := os.Getenv("SUPABASE_API_KEY")
+
+	if supabaseURL == "" {
+		return nil, fmt.Errorf("SUPABASE_URL environment variable is not set")
+	}
+	if apiKey == "" {
+		return nil, fmt.Errorf("SUPABASE_API_KEY environment variable is not set")
+	}
+
+	url := supabaseURL + "/rest/v1/" + tableName + "?select=*&order=" + orderBy
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to create request: %v", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("apikey", apiKey)
 	req.Header.Set("Authorization", "Bearer "+apiKey)
@@ -97,13 +125,20 @@ func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to execute request: %v", err)
+		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("failed to close response body: %v", err)
 		}
 	}()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+	}
 
 	return io.ReadAll(resp.Body)
 }
@@ -182,9 +217,9 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     resolveAllowedOrigins(),
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
-		AllowCredentials: false,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
@@ -243,12 +278,14 @@ func main() {
 	r.GET("/api/student", func(c *gin.Context) {
 		body, err := fetchFromSupabase("student")
 		if err != nil {
-			c.JSON(500, gin.H{"error": "取得失敗"})
+			log.Printf("Failed to fetch student: %v", err)
+			c.JSON(500, gin.H{"error": "取得失敗", "details": err.Error()})
 			return
 		}
 		var data []Student
 		if err := json.Unmarshal(body, &data); err != nil {
-			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			log.Printf("Failed to parse student JSON: %v, body: %s", err, string(body))
+			c.JSON(500, gin.H{"error": "JSONパース失敗", "details": err.Error()})
 			return
 		}
 		c.JSON(200, data)
@@ -273,12 +310,14 @@ func main() {
 	r.GET("/api/schedule", func(c *gin.Context) {
 		body, err := fetchFromSupabase("schedule")
 		if err != nil {
-			c.JSON(500, gin.H{"error": "取得失敗"})
+			log.Printf("Failed to fetch schedule: %v", err)
+			c.JSON(500, gin.H{"error": "取得失敗", "details": err.Error()})
 			return
 		}
 		var data []Schedule
 		if err := json.Unmarshal(body, &data); err != nil {
-			c.JSON(500, gin.H{"error": "JSONパース失敗"})
+			log.Printf("Failed to parse schedule JSON: %v, body: %s", err, string(body))
+			c.JSON(500, gin.H{"error": "JSONパース失敗", "details": err.Error()})
 			return
 		}
 		c.JSON(200, data)
@@ -314,7 +353,7 @@ func main() {
 		c.JSON(200, data)
 	})
 
-	if err := r.Run(); err != nil {
+	if err := r.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal("サーバー起動失敗:", err)
 	}
 }
