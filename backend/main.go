@@ -94,7 +94,7 @@ func fetchFromSupabase(tableName string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		log.Printf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
-		return nil, fmt.Errorf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("supabase API returned status %d: %s", resp.StatusCode, string(body))
 	}
 
 	return io.ReadAll(resp.Body)
@@ -137,7 +137,7 @@ func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		log.Printf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
-		return nil, fmt.Errorf("Supabase API returned status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("supabase API returned status %d: %s", resp.StatusCode, string(body))
 	}
 
 	return io.ReadAll(resp.Body)
