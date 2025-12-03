@@ -57,3 +57,71 @@ export const fetchStudents = async () => {
   }
 };
 
+/**
+ * メンター一覧を取得
+ */
+export const fetchMentors = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/mentor`);
+    if (!response.ok) {
+      throw new Error("メンターの取得に失敗しました");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch mentors", error);
+    throw error;
+  }
+};
+
+/**
+ * カリキュラム一覧を取得
+ */
+export const fetchCurriculums = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/curriculum`);
+    if (!response.ok) {
+      throw new Error("カリキュラムの取得に失敗しました");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch curriculums", error);
+    throw error;
+  }
+};
+
+/**
+ * カリキュラムマスター一覧を取得
+ */
+export const fetchCurriculumMasters = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/curriculummaster`);
+    if (!response.ok) {
+      throw new Error("カリキュラムマスターの取得に失敗しました");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch curriculum masters", error);
+    throw error;
+  }
+};
+
+/**
+ * 校舎一覧を取得
+ */
+export const fetchSchools = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/school`);
+    if (!response.ok) {
+      throw new Error("校舎の取得に失敗しました");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch schools", error);
+    throw error;
+  }
+};
+

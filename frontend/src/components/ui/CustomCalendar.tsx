@@ -2,18 +2,30 @@ import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
-import type { Schedule, ScheduleWithRelations } from "@/types/database";
+import type { ScheduleWithRelations } from "@/types/database";
 
 interface CustomCalendarProps {
   schedules: ScheduleWithRelations[];
   onScheduleClick?: (schedule: ScheduleWithRelations) => void;
+  onDateClick?: (date: Date) => void;
 }
 
 export const CustomCalendar = ({
   schedules,
   onScheduleClick,
+  onDateClick,
 }: CustomCalendarProps) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // スケジュールデータから最初の日付を取得して、その年月を初期表示にする
+  const getInitialDate = () => {
+    if (schedules.length > 0) {
+      const firstSchedule = schedules[0];
+      const scheduleDate = new Date(firstSchedule.start_time);
+      return new Date(scheduleDate.getFullYear(), scheduleDate.getMonth(), 1);
+    }
+    return new Date();
+  };
+
+  const [currentDate, setCurrentDate] = useState<Date>(getInitialDate());
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -37,12 +49,21 @@ export const CustomCalendar = ({
   // 指定日のスケジュールを取得
   const getSchedulesForDay = (day: number) => {
     const targetDate = new Date(year, month, day);
-    const targetDateStr = targetDate.toISOString().split("T")[0];
+    const targetYear = targetDate.getFullYear();
+    const targetMonth = targetDate.getMonth();
+    const targetDay = targetDate.getDate();
 
     return schedules.filter((schedule) => {
       const scheduleDate = new Date(schedule.start_time);
-      const scheduleDateStr = scheduleDate.toISOString().split("T")[0];
-      return scheduleDateStr === targetDateStr;
+      const scheduleYear = scheduleDate.getFullYear();
+      const scheduleMonth = scheduleDate.getMonth();
+      const scheduleDay = scheduleDate.getDate();
+      
+      return (
+        scheduleYear === targetYear &&
+        scheduleMonth === targetMonth &&
+        scheduleDay === targetDay
+      );
     });
   };
 
@@ -73,7 +94,7 @@ export const CustomCalendar = ({
   };
 
   // 曜日のラベル
-  const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+  const weekDayLabels = ["日", "月", "火", "水", "木", "金", "土"];
 
   // 月名を取得
   const monthName = `${year}年${month + 1}月`;
@@ -109,7 +130,7 @@ export const CustomCalendar = ({
       <div className="border border-border rounded-lg bg-card overflow-hidden">
         {/* 曜日ヘッダー */}
         <div className="grid grid-cols-7 border-b border-border">
-          {weekDays.map((day, index) => (
+          {weekDayLabels.map((day, index) => (
             <div
               key={index}
               className={cn(
@@ -139,7 +160,7 @@ export const CustomCalendar = ({
 
             // 曜日を取得
             const dayOfWeek = new Date(year, month, day).getDay();
-            const dayOfWeekName = weekDays[dayOfWeek];
+            const dayOfWeekName = weekDayLabels[dayOfWeek];
 
             return (
               <div
@@ -147,7 +168,18 @@ export const CustomCalendar = ({
                 className={cn(
                   "min-h-[120px] border-r border-b border-border last:border-r-0 p-2",
                   "flex flex-col gap-1",
+                  "cursor-pointer hover:bg-gray-50",
                 )}
+                onClick={(e) => {
+                  // スケジュールアイテムのクリックイベントを防ぐ
+                  if ((e.target as HTMLElement).closest('.schedule-item')) {
+                    return;
+                  }
+                  if (onDateClick) {
+                    const clickedDate = new Date(year, month, day);
+                    onDateClick(clickedDate);
+                  }
+                }}
               >
                 {/* 日付ラベル */}
                 <div
@@ -161,7 +193,7 @@ export const CustomCalendar = ({
 
                 {/* スケジュール一覧 */}
                 <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
-                  {daySchedules.map((schedule, scheduleIndex) => {
+                  {daySchedules.slice(0, 2).map((schedule, scheduleIndex) => {
                     const scheduleDate = new Date(schedule.start_time);
                     const timeStr = `${scheduleDate
                       .getHours()
@@ -171,27 +203,32 @@ export const CustomCalendar = ({
                       .toString()
                       .padStart(2, "0")}`;
 
+                    const studentName = schedule.student?.name || "未設定";
+                    
                     return (
                       <div
                         key={scheduleIndex}
-                        onClick={() => onScheduleClick?.(schedule)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onScheduleClick?.(schedule);
+                        }}
                         className={cn(
-                          "bg-gray-100 rounded-md p-2 text-xs cursor-pointer",
+                          "schedule-item",
+                          "bg-gray-100 rounded-md px-2 py-1 text-xs cursor-pointer",
                           "hover:bg-gray-200 transition-colors",
                         )}
                       >
-                        <div className="font-medium text-foreground mb-0.5">
-                          {timeStr}
-                        </div>
-                        <div className="text-muted-foreground text-xs">
-                          {schedule.student?.name || "未設定"}
-                        </div>
-                        <div className="text-muted-foreground text-xs">
-                          {schedule.title}
-                        </div>
+                        <span className="font-medium text-foreground">{timeStr}</span>
+                        {" "}
+                        <span className="text-muted-foreground">{studentName}</span>
                       </div>
                     );
                   })}
+                  {daySchedules.length > 2 && (
+                    <div className="text-xs text-muted-foreground px-2 py-1">
+                      その他{daySchedules.length - 2}件
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -201,4 +238,3 @@ export const CustomCalendar = ({
     </div>
   );
 };
-

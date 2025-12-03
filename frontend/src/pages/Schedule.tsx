@@ -1,23 +1,61 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CustomCalendar } from "@/components/ui/CustomCalendar";
+import { CustomScheduleDetail } from "@/components/ui/CustomScheduleDetail";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
 import type {
   Schedule as ScheduleType,
   ScheduleWithRelations,
   Student,
+  Mentor,
+  CurriculumMaster,
+  Curriculum,
+  School,
 } from "@/types/database";
-import { fetchSchedules, fetchStudents } from "@/lib/api";
+import {
+  fetchSchedules,
+  fetchStudents,
+  fetchMentors,
+  fetchCurriculums,
+  fetchCurriculumMasters,
+  fetchSchools,
+} from "@/lib/api";
 import {
   mockSchedules,
   mockStudents,
+  mockMentors,
+  mockCurriculumMasters,
+  mockSchools,
   getScheduleWithRelations,
 } from "@/mock/data";
 
 export const Schedule = () => {
-  const [schedules, setSchedules] = useState<ScheduleWithRelations[]>([]);
+  const { user } = useAuth();
+  const [allSchedules, setAllSchedules] = useState<ScheduleWithRelations[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
+  const [curriculumMasters, setCurriculumMasters] = useState<CurriculumMaster[]>([]);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [useMockData, setUseMockData] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  // 選択された校舎のスケジュールをフィルタリング
+  const schedules = useMemo(() => {
+    if (selectedSchoolId === null) {
+      return []; // デフォルトでは何も表示しない
+    }
+    return allSchedules.filter((schedule) => schedule.school_id === selectedSchoolId);
+  }, [allSchedules, selectedSchoolId]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,9 +64,20 @@ export const Schedule = () => {
 
       try {
         // まずAPIから取得を試みる
-        const [schedulesData, studentsData] = await Promise.all([
+        const [
+          schedulesData,
+          studentsData,
+          mentorsData,
+          curriculumsData,
+          curriculumMastersData,
+          schoolsData,
+        ] = await Promise.all([
           fetchSchedules(),
           fetchStudents(),
+          fetchMentors(),
+          fetchCurriculums(),
+          fetchCurriculumMasters(),
+          fetchSchools(),
         ]);
 
         // スケジュールにリレーション情報を追加
@@ -45,8 +94,12 @@ export const Schedule = () => {
             };
           });
 
-        setSchedules(schedulesWithRelations);
+        setAllSchedules(schedulesWithRelations);
         setStudents(studentsData);
+        setMentors(mentorsData);
+        setCurriculums(curriculumsData);
+        setCurriculumMasters(curriculumMastersData);
+        setSchools(schoolsData);
         setUseMockData(false);
       } catch (err) {
         console.warn("API取得に失敗しました。モックデータを使用します。", err);
@@ -54,8 +107,12 @@ export const Schedule = () => {
         const mockSchedulesWithRelations = mockSchedules.map((schedule) =>
           getScheduleWithRelations(schedule),
         );
-        setSchedules(mockSchedulesWithRelations);
+        setAllSchedules(mockSchedulesWithRelations);
         setStudents(mockStudents);
+        setMentors(mockMentors);
+        setCurriculumMasters(mockCurriculumMasters);
+        setSchools(mockSchools);
+        setCurriculums([]);
         setUseMockData(true);
       } finally {
         setIsLoading(false);
@@ -68,6 +125,17 @@ export const Schedule = () => {
   const handleScheduleClick = (schedule: ScheduleWithRelations) => {
     console.log("Schedule clicked:", schedule);
     // 将来的にモーダルや詳細表示を実装する場合はここで処理
+  };
+
+  const handleDateClick = (date: Date) => {
+    console.log("handleDateClick called with date:", date);
+    console.log("Setting selectedDate to:", date);
+    setSelectedDate(date);
+    console.log("selectedDate state updated");
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedDate(null);
   };
 
   if (isLoading) {
@@ -92,11 +160,33 @@ export const Schedule = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">スケジュール管理</h1>
-        <p className="text-muted-foreground">
-          授業予定の確認と日程調整リクエストの管理
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">スケジュール管理</h1>
+          <p className="text-muted-foreground">
+            授業予定の確認と日程調整リクエストの管理
+          </p>
+        </div>
+        {schools.length > 0 && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">校舎:</label>
+            <Select
+              value={selectedSchoolId?.toString() || ""}
+              onValueChange={(value) => setSelectedSchoolId(Number(value))}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="校舎を選択" />
+              </SelectTrigger>
+              <SelectContent>
+                {schools.map((school) => (
+                  <SelectItem key={school.id} value={school.id.toString()}>
+                    {school.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {useMockData && (
@@ -105,10 +195,28 @@ export const Schedule = () => {
         </div>
       )}
 
-      <CustomCalendar
-        schedules={schedules}
-        onScheduleClick={handleScheduleClick}
-      />
+      {selectedSchoolId === null ? (
+        <div className="flex items-center justify-center min-h-[400px] border border-border rounded-lg bg-card">
+          <p className="text-muted-foreground">校舎を選択してください</p>
+        </div>
+      ) : (
+        <CustomCalendar
+          schedules={schedules}
+          onScheduleClick={handleScheduleClick}
+          onDateClick={handleDateClick}
+        />
+      )}
+
+      {selectedDate && (
+        <CustomScheduleDetail
+          date={selectedDate}
+          schedules={schedules}
+          mentors={mentors}
+          curriculumMasters={curriculumMasters}
+          curriculums={curriculums}
+          onClose={handleCloseDetail}
+        />
+      )}
     </div>
   );
 };
