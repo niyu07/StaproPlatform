@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/contexts/AuthContext";
 import type {
   Schedule as ScheduleType,
   ScheduleWithRelations,
@@ -36,8 +35,8 @@ import {
 } from "@/mock/data";
 
 export const Schedule = () => {
-  const { user } = useAuth();
   const [allSchedules, setAllSchedules] = useState<ScheduleWithRelations[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [students, setStudents] = useState<Student[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [curriculums, setCurriculums] = useState<Curriculum[]>([]);

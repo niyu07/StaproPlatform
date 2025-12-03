@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { X } from "lucide-react";
 import { Button } from "./button";
 import { useSidebarWidth } from "@/hooks/useSidebarWidth";
-import { cn } from "@/lib/utils";
 import type {
   ScheduleWithRelations,
   Mentor,
@@ -122,27 +121,6 @@ export const CustomScheduleDetail = ({
     return mentor?.name || "未設定";
   };
 
-  // カリキュラム名を取得
-  const getCurriculumName = (schedule: ScheduleWithRelations) => {
-    // 生徒のカリキュラムを取得
-    const curriculum = curriculums.find(
-      (c) => c.user_id === schedule.user_id,
-    );
-    if (curriculum) {
-      // カリキュラムマスターから名前を取得
-      const curriculumMaster = curriculumMasters.find(
-        (cm) => cm.id === curriculum.curriculum_id,
-      );
-      if (curriculumMaster) {
-        return curriculumMaster.name;
-      }
-    }
-    // フォールバック: タイトルから「の授業」を削除
-    if (schedule.title) {
-      return schedule.title.replace("の授業", "");
-    }
-    return "未設定";
-  };
 
   const formatDate = (date: Date) => {
     const weekDays = ["日", "月", "火", "水", "木", "金", "土"];

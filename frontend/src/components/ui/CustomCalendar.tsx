@@ -82,6 +82,7 @@ export const CustomCalendar = ({
     }
 
     return days;
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
   }, [firstDayOfWeek, daysInMonth]);
 
   // 月のナビゲーション
