@@ -58,7 +58,7 @@ export const CustomCalendar = ({
       const scheduleYear = scheduleDate.getFullYear();
       const scheduleMonth = scheduleDate.getMonth();
       const scheduleDay = scheduleDate.getDate();
-      
+
       return (
         scheduleYear === targetYear &&
         scheduleMonth === targetMonth &&
@@ -173,7 +173,7 @@ export const CustomCalendar = ({
                 )}
                 onClick={(e) => {
                   // スケジュールアイテムのクリックイベントを防ぐ
-                  if ((e.target as HTMLElement).closest('.schedule-item')) {
+                  if ((e.target as HTMLElement).closest(".schedule-item")) {
                     return;
                   }
                   if (onDateClick) {
@@ -205,7 +205,7 @@ export const CustomCalendar = ({
                       .padStart(2, "0")}`;
 
                     const studentName = schedule.student?.name || "未設定";
-                    
+
                     return (
                       <div
                         key={scheduleIndex}
@@ -219,9 +219,12 @@ export const CustomCalendar = ({
                           "hover:bg-gray-200 transition-colors",
                         )}
                       >
-                        <span className="font-medium text-foreground">{timeStr}</span>
-                        {" "}
-                        <span className="text-muted-foreground">{studentName}</span>
+                        <span className="font-medium text-foreground">
+                          {timeStr}
+                        </span>{" "}
+                        <span className="text-muted-foreground">
+                          {studentName}
+                        </span>
                       </div>
                     );
                   })}

@@ -124,4 +124,3 @@ export const fetchSchools = async () => {
     throw error;
   }
 };
-

@@ -10,7 +10,9 @@ export const useSidebarWidth = () => {
   useEffect(() => {
     const updateSidebarWidth = () => {
       // サイドバーの要素を取得
-      const sidebar = document.querySelector('.sidebar-wrapper aside, aside.w-\\[260px\\]');
+      const sidebar = document.querySelector(
+        ".sidebar-wrapper aside, aside.w-\\[260px\\]",
+      );
       if (sidebar) {
         const width = sidebar.getBoundingClientRect().width;
         setSidebarWidth(width);
@@ -24,7 +26,7 @@ export const useSidebarWidth = () => {
     updateSidebarWidth();
 
     // リサイズイベントを監視
-    window.addEventListener('resize', updateSidebarWidth);
+    window.addEventListener("resize", updateSidebarWidth);
 
     // MutationObserverでサイドバーの表示/非表示を監視
     const observer = new MutationObserver(updateSidebarWidth);
@@ -33,15 +35,14 @@ export const useSidebarWidth = () => {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
 
     return () => {
-      window.removeEventListener('resize', updateSidebarWidth);
+      window.removeEventListener("resize", updateSidebarWidth);
       observer.disconnect();
     };
   }, []);
 
   return sidebarWidth;
 };
-

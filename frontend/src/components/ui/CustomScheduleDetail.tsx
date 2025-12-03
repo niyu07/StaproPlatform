@@ -38,7 +38,7 @@ export const CustomScheduleDetail = ({
   onClose,
 }: CustomScheduleDetailProps) => {
   const sidebarWidth = useSidebarWidth();
-  
+
   console.log("CustomScheduleDetail rendered with date:", date);
   console.log("Schedules count:", schedules.length);
   console.log("Mentors count:", mentors.length);
@@ -51,7 +51,7 @@ export const CustomScheduleDetail = ({
     const targetYear = date.getFullYear();
     const targetMonth = date.getMonth();
     const targetDay = date.getDate();
-    
+
     console.log("Filtering schedules for date:", {
       targetYear,
       targetMonth: targetMonth + 1,
@@ -60,7 +60,7 @@ export const CustomScheduleDetail = ({
 
     // スケジュールデータから実際に存在する年を取得
     const availableYears = new Set<number>();
-    schedules.forEach(s => {
+    schedules.forEach((s) => {
       const d = new Date(s.start_time);
       availableYears.add(d.getFullYear());
     });
@@ -71,12 +71,12 @@ export const CustomScheduleDetail = ({
       const scheduleYear = scheduleDate.getFullYear();
       const scheduleMonth = scheduleDate.getMonth();
       const scheduleDay = scheduleDate.getDate();
-      
+
       const matches =
         scheduleYear === targetYear &&
         scheduleMonth === targetMonth &&
         scheduleDay === targetDay;
-      
+
       if (matches) {
         console.log("Matched schedule:", {
           start_time: schedule.start_time,
@@ -85,7 +85,7 @@ export const CustomScheduleDetail = ({
           scheduleDay,
         });
       }
-      
+
       return matches;
     });
 
@@ -121,7 +121,6 @@ export const CustomScheduleDetail = ({
     return mentor?.name || "未設定";
   };
 
-
   const formatDate = (date: Date) => {
     const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
     const month = date.getMonth() + 1;
@@ -143,14 +142,16 @@ export const CustomScheduleDetail = ({
   }, [sidebarWidth]);
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto" 
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
       style={modalStyle}
     >
       <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col my-auto">
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-bold">{formatDate(date)}のスケジュール</h2>
+          <h2 className="text-xl font-bold">
+            {formatDate(date)}のスケジュール
+          </h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
@@ -165,17 +166,15 @@ export const CustomScheduleDetail = ({
           ) : (
             <div className="space-y-4">
               {groupedSchedules.map((group) => (
-                <div 
-                  key={group.hour} 
+                <div
+                  key={group.hour}
                   className="bg-gray-50 rounded-lg p-4 border border-gray-200"
                 >
-                  <h3 className="text-lg font-semibold mb-4">
-                    {group.hour}時
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-4">{group.hour}時</h3>
                   {(() => {
                     // 先生ごとにグループ化
                     const mentorMap = new Map<number, MentorGroup>();
-                    
+
                     group.schedules.forEach((schedule) => {
                       const mentorId = schedule.mentor_id;
                       if (!mentorMap.has(mentorId)) {
@@ -193,8 +192,8 @@ export const CustomScheduleDetail = ({
                     return (
                       <div className="flex gap-2">
                         {mentorGroups.map((mentorGroup, mentorIndex) => (
-                          <div 
-                            key={mentorIndex} 
+                          <div
+                            key={mentorIndex}
                             className="flex-1 border border-gray-300 rounded-md bg-white p-3"
                           >
                             {/* 先生名 */}
@@ -203,20 +202,26 @@ export const CustomScheduleDetail = ({
                             </div>
                             {/* 生徒名とカリキュラム */}
                             <div className="space-y-2">
-                              {mentorGroup.schedules.map((schedule, scheduleIndex) => {
-                                const studentName = schedule.student?.name || "未設定";
-                                
-                                return (
-                                  <div key={scheduleIndex} className="space-y-1">
-                                    <div className="font-medium text-sm">
-                                      {studentName}
+                              {mentorGroup.schedules.map(
+                                (schedule, scheduleIndex) => {
+                                  const studentName =
+                                    schedule.student?.name || "未設定";
+
+                                  return (
+                                    <div
+                                      key={scheduleIndex}
+                                      className="space-y-1"
+                                    >
+                                      <div className="font-medium text-sm">
+                                        {studentName}
+                                      </div>
+                                      <div className="text-xs text-muted-foreground">
+                                        カリキュラム名（開発予定）
+                                      </div>
                                     </div>
-                                    <div className="text-xs text-muted-foreground">
-                                      カリキュラム名（開発予定）
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                },
+                              )}
                             </div>
                           </div>
                         ))}
@@ -232,4 +237,3 @@ export const CustomScheduleDetail = ({
     </div>
   );
 };
-

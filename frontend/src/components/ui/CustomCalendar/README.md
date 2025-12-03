@@ -25,7 +25,7 @@ const schedules: ScheduleWithRelations[] = [
   onScheduleClick={(schedule) => {
     console.log("Clicked schedule:", schedule);
   }}
-/>
+/>;
 ```
 
 ## Props
@@ -38,4 +38,3 @@ const schedules: ScheduleWithRelations[] = [
 - Tailwind CSSを使用
 - shadcn/uiのテーマシステムに準拠
 - レスポンシブデザイン対応
-

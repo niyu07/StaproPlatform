@@ -40,7 +40,9 @@ export const Schedule = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
-  const [curriculumMasters, setCurriculumMasters] = useState<CurriculumMaster[]>([]);
+  const [curriculumMasters, setCurriculumMasters] = useState<
+    CurriculumMaster[]
+  >([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +55,9 @@ export const Schedule = () => {
     if (selectedSchoolId === null) {
       return []; // デフォルトでは何も表示しない
     }
-    return allSchedules.filter((schedule) => schedule.school_id === selectedSchoolId);
+    return allSchedules.filter(
+      (schedule) => schedule.school_id === selectedSchoolId,
+    );
   }, [allSchedules, selectedSchoolId]);
 
   useEffect(() => {
@@ -219,4 +223,3 @@ export const Schedule = () => {
     </div>
   );
 };
-
