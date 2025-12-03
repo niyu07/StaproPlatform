@@ -40,7 +40,7 @@ export default function Dashboard() {
       .filter((schedule) => new Date(schedule.end_time) > now)
       .sort(
         (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
       );
   }, []);
 
@@ -55,7 +55,7 @@ export default function Dashboard() {
     return mockMentors.map((mentor) => {
       // このメンターが担当する今後のスケジュール
       const mentorSchedules = filteredSchedules.filter(
-        (s) => s.mentor_id === mentor.id
+        (s) => s.mentor_id === mentor.id,
       );
 
       // 担当生徒のユニークなuser_idを取得
@@ -66,12 +66,12 @@ export default function Dashboard() {
         const student = mockStudents.find((s) => s.user_id === userId);
         // 生徒のカリキュラムを取得
         const studentCurriculums = mockCurriculums.filter(
-          (c) => c.user_id === userId
+          (c) => c.user_id === userId,
         );
         const curriculumNames = studentCurriculums
           .map((c) => {
             const master = mockCurriculumMasters.find(
-              (m) => m.id === c.curriculum_id
+              (m) => m.id === c.curriculum_id,
             );
             return master?.name;
           })
@@ -90,7 +90,7 @@ export default function Dashboard() {
         schoolCounts[s.school_id] = (schoolCounts[s.school_id] || 0) + 1;
       });
       const mainSchoolId = Object.entries(schoolCounts).sort(
-        ([, a], [, b]) => b - a
+        ([, a], [, b]) => b - a,
       )[0]?.[0];
       const mainSchool = mockSchools.find((s) => s.id === Number(mainSchoolId));
 
@@ -108,7 +108,7 @@ export default function Dashboard() {
     return mockSchools.map((school) => {
       // この校舎の今後のスケジュール
       const schoolUpcoming = upcomingSchedules.filter(
-        (s) => s.school_id === school.id
+        (s) => s.school_id === school.id,
       );
 
       // 最も近い開始時刻を取得
@@ -130,7 +130,7 @@ export default function Dashboard() {
       // 生徒情報を取得
       const students = sameTimeSchedules.map((schedule) => {
         const student = mockStudents.find(
-          (s) => s.user_id === schedule.user_id
+          (s) => s.user_id === schedule.user_id,
         );
         return {
           name: student?.name || "不明",
