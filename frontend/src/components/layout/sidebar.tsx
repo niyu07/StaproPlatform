@@ -3,8 +3,29 @@ import { SidebarItem } from "./sidebar-item";
 import { Logo } from "../ui/logo";
 import { UserProfile } from "../ui/user-profile";
 import { LogoutButton } from "../ui/logout-button";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const Sidebar = () => {
+  const { user, logout } = useAuth();
+
+  const displayName = user?.name ?? "管理者";
+  const displayRole = (() => {
+    switch (user?.role) {
+      case "teacher":
+        return "Teacher";
+      case "student":
+        return "Student";
+      case "admin":
+        return "Admin";
+      default:
+        return "Admin";
+    }
+  })();
+
+  const handleLogout = () => {
+    void logout();
+  };
+
   const navItems = [
     { icon: LayoutGrid, label: "ダッシュボード", path: "/" },
     { icon: Calendar, label: "スケジュール管理", path: "/schedule" },
@@ -31,8 +52,8 @@ export const Sidebar = () => {
       </nav>
 
       <div className="p-4 border-t border-border flex flex-col gap-4">
-        <UserProfile name="管理者" role="Admin" />
-        <LogoutButton />
+        <UserProfile name={displayName} role={displayRole} />
+        <LogoutButton onClick={handleLogout} />
       </div>
     </aside>
   );

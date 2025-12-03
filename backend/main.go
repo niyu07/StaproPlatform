@@ -6,9 +6,54 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
+	"strings"
+	"sync"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/time/rate"
+)
+
+type loginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type loginUser struct {
+	Name         string
+	Role         string
+	PasswordHash string
+}
+
+var staticUsers = map[string]loginUser{
+	"admin@example.com": {
+		Name:         "管理者ユーザー",
+		Role:         "admin",
+		PasswordHash: "$2a$10$p5MmKREkYC.6ohwGEMfWKep/PcmauP3hYne/4QfUyw/HGcJe7UzO.",
+	},
+	"teacher@example.com": {
+		Name:         "講師ユーザー",
+		Role:         "teacher",
+		PasswordHash: "$2a$10$egofAWeF49PluFLJTITz2eTfTVSEUClpJ2NdoD2aO8.SFzZJCI1yS",
+	},
+	"student@example.com": {
+		Name:         "生徒ユーザー",
+		Role:         "student",
+		PasswordHash: "$2a$10$WhtQoePHVfNbo5RdgE.TauHlp8vXSHf2SOes2x4ngUiutEIo6mgLS",
+	},
+}
+
+const (
+	loginErrorMessage          = "メールアドレスまたはパスワードが正しくありません"
+	loginRateLimitErrorMessage = "ログイン試行が多すぎます。しばらくしてから再度お試しください。"
+	maxEmailLength             = 254
+	maxPasswordLength          = 72
+	loginRateLimitMaxRequests  = 5
+	loginRateLimitWindow       = time.Minute
 )
 
 // 汎用的なSupabaseデータ取得関数
@@ -63,8 +108,91 @@ func fetchFromSupabaseWithOrder(tableName string, orderBy string) ([]byte, error
 	return io.ReadAll(resp.Body)
 }
 
+func resolveAllowedOrigins() []string {
+	origins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
+	var cleaned []string
+	for _, origin := range origins {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			cleaned = append(cleaned, trimmed)
+		}
+	}
+	if len(cleaned) == 0 {
+		return []string{"http://localhost:5173"}
+	}
+	return cleaned
+}
+
+type ipRateLimiter struct {
+	mu          sync.Mutex
+	clients     map[string]*rate.Limiter
+	maxRequests int
+	window      time.Duration
+}
+
+func newIPRateLimiter(maxRequests int, window time.Duration) *ipRateLimiter {
+	if maxRequests <= 0 {
+		maxRequests = 1
+	}
+	if window <= 0 {
+		window = time.Minute
+	}
+	return &ipRateLimiter{
+		clients:     make(map[string]*rate.Limiter),
+		maxRequests: maxRequests,
+		window:      window,
+	}
+}
+
+func (l *ipRateLimiter) getLimiter(ip string) *rate.Limiter {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	limiter, exists := l.clients[ip]
+	if !exists {
+		perRequest := l.window / time.Duration(l.maxRequests)
+		if perRequest <= 0 {
+			perRequest = time.Minute / time.Duration(l.maxRequests)
+		}
+		limiter = rate.NewLimiter(rate.Every(perRequest), l.maxRequests)
+		l.clients[ip] = limiter
+	}
+	return limiter
+}
+
+func (l *ipRateLimiter) allow(ip string) bool {
+	return l.getLimiter(ip).Allow()
+}
+
+func rateLimitMiddleware(l *ipRateLimiter) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !l.allow(c.ClientIP()) {
+			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+				"success": false,
+				"message": loginRateLimitErrorMessage,
+			})
+			return
+		}
+		c.Next()
+	}
+}
+
 func main() {
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     resolveAllowedOrigins(),
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	loginLimiter := newIPRateLimiter(loginRateLimitMaxRequests, loginRateLimitWindow)
+	r.POST("/api/login", rateLimitMiddleware(loginLimiter), handleLogin)
+	r.POST("/api/logout", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"success": true})
+	})
 
 	// 校舎一覧
 	r.GET("/api/school", func(c *gin.Context) {
@@ -189,4 +317,42 @@ func main() {
 	if err := r.Run(); err != nil {
 		log.Fatal("サーバー起動失敗:", err)
 	}
+}
+
+func handleLogin(c *gin.Context) {
+	var req loginRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	emailRaw := strings.TrimSpace(req.Email)
+	if emailRaw == "" || len(emailRaw) > maxEmailLength {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+	if _, err := mail.ParseAddress(emailRaw); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	password := req.Password
+	if strings.TrimSpace(password) == "" || len(password) > maxPasswordLength {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	email := strings.ToLower(emailRaw)
+	user, ok := staticUsers[email]
+	if !ok || bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": loginErrorMessage})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"email":   email,
+		"name":    user.Name,
+		"role":    user.Role,
+	})
 }
