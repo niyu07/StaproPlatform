@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
-import { Dashboard } from "./pages/Dashboard";
+import Dashboard from "./features/home/Dashboard";
 import { StudentsList } from "./pages/StudentsList";
 import { Schedule } from "./pages/Schedule";
 import { Login } from "./pages/Login/Login";
