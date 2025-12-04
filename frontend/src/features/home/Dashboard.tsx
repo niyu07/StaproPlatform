@@ -40,7 +40,7 @@ export default function Dashboard() {
       .filter((schedule) => new Date(schedule.end_time) > now)
       .sort(
         (a, b) =>
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
       );
   }, []);
 
@@ -55,7 +55,7 @@ export default function Dashboard() {
     return mockMentors.map((mentor) => {
       // このメンターが担当する今後のスケジュール
       const mentorSchedules = filteredSchedules.filter(
-        (s) => s.mentor_id === mentor.id,
+        (s) => s.mentor_id === mentor.id
       );
 
       // 担当生徒のユニークなuser_idを取得
@@ -66,12 +66,12 @@ export default function Dashboard() {
         const student = mockStudents.find((s) => s.user_id === userId);
         // 生徒のカリキュラムを取得
         const studentCurriculums = mockCurriculums.filter(
-          (c) => c.user_id === userId,
+          (c) => c.user_id === userId
         );
         const curriculumNames = studentCurriculums
           .map((c) => {
             const master = mockCurriculumMasters.find(
-              (m) => m.id === c.curriculum_id,
+              (m) => m.id === c.curriculum_id
             );
             return master?.name;
           })
@@ -90,7 +90,7 @@ export default function Dashboard() {
         schoolCounts[s.school_id] = (schoolCounts[s.school_id] || 0) + 1;
       });
       const mainSchoolId = Object.entries(schoolCounts).sort(
-        ([, a], [, b]) => b - a,
+        ([, a], [, b]) => b - a
       )[0]?.[0];
       const mainSchool = mockSchools.find((s) => s.id === Number(mainSchoolId));
 
@@ -108,7 +108,7 @@ export default function Dashboard() {
     return mockSchools.map((school) => {
       // この校舎の今後のスケジュール
       const schoolUpcoming = upcomingSchedules.filter(
-        (s) => s.school_id === school.id,
+        (s) => s.school_id === school.id
       );
 
       // 最も近い開始時刻を取得
@@ -130,7 +130,7 @@ export default function Dashboard() {
       // 生徒情報を取得
       const students = sameTimeSchedules.map((schedule) => {
         const student = mockStudents.find(
-          (s) => s.user_id === schedule.user_id,
+          (s) => s.user_id === schedule.user_id
         );
         return {
           name: student?.name || "不明",
@@ -193,23 +193,29 @@ export default function Dashboard() {
                     {mentor.name[0]}
                   </div>
                   <div className="flex-1">
-                    <div className="font-bold text-base text-gray-900">{mentor.name}</div>
+                    <div className="font-bold text-base text-gray-900">
+                      {mentor.name}
+                    </div>
                     <div className="text-xs text-gray-500">
                       {mentor.school} | 担当 {mentor.count}名
                     </div>
                   </div>
                 </div>
-                  <div className="flex flex-col gap-2">
-                    {mentor.students.map((s, i) => (
-                      <div
-                        key={i}
-                        className="border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 flex flex-col"
-                      >
-                        <span className="font-medium text-sm text-gray-900">{s.name}</span>
-                        <span className="text-xs text-gray-500 mt-1">{s.subject}</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="flex flex-col gap-2">
+                  {mentor.students.map((s, i) => (
+                    <div
+                      key={i}
+                      className="border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 flex flex-col"
+                    >
+                      <span className="font-medium text-sm text-gray-900">
+                        {s.name}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-1">
+                        {s.subject}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
         </div>
@@ -225,7 +231,9 @@ export default function Dashboard() {
               className="bg-white rounded-2xl shadow border border-gray-200 p-5 flex flex-col gap-3"
             >
               <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-base text-gray-900">{sched.school}</span>
+                <span className="font-bold text-base text-gray-900">
+                  {sched.school}
+                </span>
                 <span className="bg-gray-800 text-white text-xs rounded-lg px-3 py-1 font-semibold">
                   次 {sched.time}から
                 </span>
@@ -238,10 +246,16 @@ export default function Dashboard() {
                       className="border border-gray-200 rounded-xl px-3 py-2 bg-gray-100 flex flex-col"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm text-gray-900">{s.name}</span>
-                        <span className="text-xs text-gray-700 font-bold">{sched.time.split(" ")[1]}</span>
+                        <span className="font-medium text-sm text-gray-900">
+                          {s.name}
+                        </span>
+                        <span className="text-xs text-gray-700 font-bold">
+                          {sched.time.split(" ")[1]}
+                        </span>
                       </div>
-                      <span className="text-xs text-gray-700 mt-1">{s.subject}</span>
+                      <span className="text-xs text-gray-700 mt-1">
+                        {s.subject}
+                      </span>
                     </div>
                   ))
                 ) : (
