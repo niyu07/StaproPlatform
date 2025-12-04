@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { StudentsList } from "./pages/StudentsList";
+import { Schedule } from "./pages/Schedule";
 import { Login } from "./pages/Login/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
@@ -57,15 +58,7 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
-            <Route
-              path="schedule"
-              element={
-                <div className="p-6">
-                  <h2>スケジュール管理</h2>
-                  <p>開発中...</p>
-                </div>
-              }
-            />
+            <Route path="schedule" element={<Schedule />} />
             <Route path="students" element={<StudentsList />} />
             <Route
               path="curriculum"
