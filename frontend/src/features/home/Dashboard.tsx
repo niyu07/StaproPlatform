@@ -186,34 +186,30 @@ export default function Dashboard() {
             .map((mentor, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow border p-5 flex flex-col gap-3"
+                className="bg-white rounded-2xl shadow border border-gray-200 p-5 flex flex-col gap-3"
               >
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-xl">
                     {mentor.name[0]}
                   </div>
                   <div className="flex-1">
-                    <div className="font-bold text-base">{mentor.name}</div>
+                    <div className="font-bold text-base text-gray-900">{mentor.name}</div>
                     <div className="text-xs text-gray-500">
                       {mentor.school} | 担当 {mentor.count}名
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  {mentor.students.map((s, i) => (
-                    <div
-                      key={i}
-                      className="border rounded-xl px-3 py-2 bg-gray-50 flex flex-col"
-                    >
-                      <span className="font-medium text-sm text-gray-800">
-                        {s.name}
-                      </span>
-                      <span className="text-xs text-gray-500 mt-1">
-                        {s.subject}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                  <div className="flex flex-col gap-2">
+                    {mentor.students.map((s, i) => (
+                      <div
+                        key={i}
+                        className="border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 flex flex-col"
+                      >
+                        <span className="font-medium text-sm text-gray-900">{s.name}</span>
+                        <span className="text-xs text-gray-500 mt-1">{s.subject}</span>
+                      </div>
+                    ))}
+                  </div>
               </div>
             ))}
         </div>
@@ -226,11 +222,11 @@ export default function Dashboard() {
           {schoolSchedules.map((sched, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl shadow border p-5 flex flex-col gap-3"
+              className="bg-white rounded-2xl shadow border border-gray-200 p-5 flex flex-col gap-3"
             >
               <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-base">{sched.school}</span>
-                <span className="bg-blue-600 text-white text-xs rounded-lg px-3 py-1 font-semibold">
+                <span className="font-bold text-base text-gray-900">{sched.school}</span>
+                <span className="bg-gray-800 text-white text-xs rounded-lg px-3 py-1 font-semibold">
                   次 {sched.time}から
                 </span>
               </div>
@@ -239,19 +235,13 @@ export default function Dashboard() {
                   sched.students.map((s, i) => (
                     <div
                       key={i}
-                      className="border rounded-xl px-3 py-2 bg-blue-50 flex flex-col"
+                      className="border border-gray-200 rounded-xl px-3 py-2 bg-gray-100 flex flex-col"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm text-blue-900">
-                          {s.name}
-                        </span>
-                        <span className="text-xs text-blue-700 font-bold">
-                          {sched.time.split(" ")[1]}
-                        </span>
+                        <span className="font-medium text-sm text-gray-900">{s.name}</span>
+                        <span className="text-xs text-gray-700 font-bold">{sched.time.split(" ")[1]}</span>
                       </div>
-                      <span className="text-xs text-blue-700 mt-1">
-                        {s.subject}
-                      </span>
+                      <span className="text-xs text-gray-700 mt-1">{s.subject}</span>
                     </div>
                   ))
                 ) : (
