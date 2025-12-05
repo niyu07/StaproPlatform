@@ -126,23 +126,32 @@ export const CurriculumManagement = () => {
 
   const progressPercent = useMemo(() => {
     if (filteredCurriculums.length === 0) return 0;
-    // スクラッチカリキュラムの場合、全小項目の中で最大の進捗を取得
+    // スクラッチカリキュラムの場合、チェックが付いた（完了した）授業回の合計を計算
     const curriculum = filteredCurriculums[0];
     if (curriculum.lessonDetails && curriculum.lessonDetails.length > 0) {
-      const allProgresses = curriculum.lessonDetails
-        .flatMap((lesson) => [
-          lesson.progress1,
-          lesson.progress2,
-          lesson.progress3,
-          lesson.progress4,
-          lesson.progress5,
-          lesson.progress6,
-          lesson.progress7,
-          lesson.progress8,
-          lesson.overallProgress,
-        ])
-        .filter((p): p is number => p !== undefined);
-      return allProgresses.length > 0 ? Math.max(...allProgresses) : 0;
+      const totalLessons = curriculum.lessonDetails.length;
+      let completedLessons = 0;
+
+      for (const lesson of curriculum.lessonDetails) {
+        const lessonProgress = Math.max(
+          lesson.progress1 ?? 0,
+          lesson.progress2 ?? 0,
+          lesson.progress3 ?? 0,
+          lesson.progress4 ?? 0,
+          lesson.progress5 ?? 0,
+          lesson.progress6 ?? 0,
+          lesson.progress7 ?? 0,
+          lesson.progress8 ?? 0,
+          lesson.overallProgress ?? 0,
+        );
+        // 進捗が100%以上の場合、完了とみなす
+        if (lessonProgress >= 100) {
+          completedLessons++;
+        }
+      }
+
+      // 完了した授業回数 / 全授業回数 * 100
+      return Math.round((completedLessons / totalLessons) * 100);
     }
     // 通常のカリキュラムの場合、カリキュラムの進捗をそのまま使用
     return curriculum.progress;

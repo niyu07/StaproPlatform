@@ -68,7 +68,7 @@ export const scratchLessonDetails: LessonDetail[] = [
   },
   {
     lessonNumber: 5,
-    goal: "メッセージを使い、適切なタイミングにプログラムが動作するようにしよう！",
+    goal: "適切なタイミングにプログラムが動作するようにしよう！",
     subItem1: "他のスプライトと連携をさせる",
     description1: "3-2",
     progress1: 17,
@@ -280,8 +280,8 @@ export const scratchLessonDetails: LessonDetail[] = [
     lessonNumber: 24,
     goal: "検定問題に挑戦しよう！",
     subItem1: "検定練習2周目orアレンジ練習",
-    progress1: 100,
-    overallProgress: 100,
+    progress1: 50,
+    overallProgress: 50,
     conversation:
       "学習いただく予定のカリキュラムはすべて終了しており、引き続き理解度を深めるために検定練習を行う予定となっております",
   },
