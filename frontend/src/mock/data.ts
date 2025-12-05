@@ -11,7 +11,10 @@ import type {
   Schedule,
   Curriculum,
   Admin,
+  CurriculumDisplay,
+  StudentCurriculum,
 } from "../types/database";
+import { scratchLessonDetails } from "./scratchLessons";
 
 // 校舎マスター
 export const mockSchools: School[] = [
@@ -239,3 +242,212 @@ export const getCurriculumWithRelations = (curriculum: Curriculum) => ({
   student: getStudentById(curriculum.user_id),
   curriculum_master: getCurriculumMasterById(curriculum.curriculum_id),
 });
+
+// カリキュラム管理画面用のモックデータ
+export const mockStudentCurriculums: StudentCurriculum[] = [
+  // 田中一郎
+  { id: 1, user_id: 101, curriculum_id: 1, lessons: 5 }, // スクラッチ
+  { id: 2, user_id: 101, curriculum_id: 2, lessons: 3 }, // マイクラ
+  // 木村太郎
+  { id: 3, user_id: 102, curriculum_id: 3, lessons: 4 }, // HTML
+  { id: 4, user_id: 102, curriculum_id: 4, lessons: 2 }, // Javascript
+  // 竹本花子
+  { id: 5, user_id: 103, curriculum_id: 1, lessons: 6 }, // スクラッチ
+  { id: 6, user_id: 103, curriculum_id: 3, lessons: 8 }, // HTML
+  { id: 7, user_id: 103, curriculum_id: 5, lessons: 1 }, // Unity
+];
+
+// 画面表示用のカリキュラム情報
+export const mockCurriculumDisplays: CurriculumDisplay[] = [
+  // スクラッチカリキュラム（授業回詳細データ付き）
+  {
+    id: "cur-scratch-101",
+    userId: 101,
+    name: "スクラッチ基礎",
+    code: "CUR-SCRATCH-101",
+    category: "スクラッチ",
+    level: "初級",
+    targetGrade: "小5",
+    totalLessons: 24,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "スクラッチの基礎から検定問題まで学習するカリキュラムです。",
+    progress: 100,
+    cardStatus: "current",
+    lessonDetails: scratchLessonDetails,
+  },
+  {
+    id: "cur-scratch-103",
+    userId: 103,
+    name: "スクラッチ基礎",
+    code: "CUR-SCRATCH-103",
+    category: "スクラッチ",
+    level: "初級",
+    targetGrade: "中2",
+    totalLessons: 24,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "スクラッチの基礎から検定問題まで学習するカリキュラムです。",
+    progress: 88,
+    cardStatus: "current",
+    lessonDetails: scratchLessonDetails.map((lesson, index) => {
+      if (index === 21) {
+        return { ...lesson, progress1: 88 };
+      }
+      if (index < 21) {
+        return { ...lesson, progress1: 100, overallProgress: 100 };
+      }
+      return lesson;
+    }),
+  },
+  {
+    id: "cur-17",
+    userId: 103,
+    name: "カリキュラム17",
+    code: "CUR-17",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "HTML/CSS基礎のカリキュラム17です。",
+    progress: 32,
+    cardStatus: "completed",
+  },
+  {
+    id: "cur-18",
+    userId: 103,
+    name: "カリキュラム18",
+    code: "CUR-18",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "HTML/CSS基礎のカリキュラム18です。",
+    progress: 36,
+    cardStatus: "completed",
+  },
+  {
+    id: "cur-practice",
+    userId: 103,
+    name: "練習問題模写",
+    code: "CUR-PRACTICE",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "練習問題の模写課題です。",
+    progress: 40,
+    cardStatus: "completed",
+  },
+  {
+    id: "cur-git-1",
+    userId: 103,
+    name: "Gitカリキュラム1",
+    code: "CUR-GIT-1",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "Git基礎のカリキュラム1です。",
+    progress: 42,
+    cardStatus: "current",
+  },
+  {
+    id: "cur-git-2",
+    userId: 103,
+    name: "Gitカリキュラム2",
+    code: "CUR-GIT-2",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "Git基礎のカリキュラム2です。",
+    progress: 44,
+    cardStatus: "upcoming",
+  },
+  {
+    id: "cur-portfolio-top",
+    userId: 103,
+    name: "自己紹介サイト制作 (トップページ)",
+    code: "CUR-PORTFOLIO-TOP",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "自己紹介サイトのトップページ制作です。",
+    progress: 48,
+    cardStatus: "upcoming",
+  },
+  {
+    id: "cur-portfolio-works-1",
+    userId: 103,
+    name: "自己紹介サイト制作 (作品紹介)",
+    code: "CUR-PORTFOLIO-WORKS-1",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "自己紹介サイトの作品紹介ページ制作です。",
+    progress: 52,
+    cardStatus: "upcoming",
+  },
+  {
+    id: "cur-portfolio-works-2",
+    userId: 103,
+    name: "自己紹介サイト制作 (作品紹介)",
+    code: "CUR-PORTFOLIO-WORKS-2",
+    category: "HTML",
+    level: "標準",
+    targetGrade: "中2",
+    totalLessons: 10,
+    lessonDuration: 60,
+    teacherName: "担当メンター",
+    enrolledCount: 1,
+    status: "active",
+    updatedAt: "2025-11-20",
+    description: "自己紹介サイトの作品紹介ページ制作（続き）です。",
+    progress: 56,
+    cardStatus: "upcoming",
+  },
+];

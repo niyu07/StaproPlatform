@@ -5,6 +5,8 @@ import Dashboard from "./features/home/Dashboard";
 import { StudentsList } from "./pages/StudentsList";
 import { Schedule } from "./pages/Schedule";
 import { Login } from "./pages/Login/Login";
+import { AIIntegration } from "./pages/AIIntegration";
+import { CurriculumManagement } from "./pages/CurriculumManagement";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
@@ -22,6 +24,51 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 };
 
+// 保護者（student）・管理者・教師がアクセス可能なルート（スケジュール管理とカリキュラム管理）
+const ParentAccessibleRoute = ({ children }: { children: ReactNode }) => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="loading">読み込み中...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 保護者（student）、管理者、教師はアクセス可能
+  if (
+    user?.role === "student" ||
+    user?.role === "admin" ||
+    user?.role === "teacher"
+  ) {
+    return <>{children}</>;
+  }
+
+  // その他のロールはアクセス不可
+  return <Navigate to="/login" replace />;
+};
+
+// 管理者・教師専用ルート（保護者はアクセス不可）
+const AdminTeacherRoute = ({ children }: { children: ReactNode }) => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="loading">読み込み中...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role === "admin" || user?.role === "teacher") {
+    return <>{children}</>;
+  }
+
+  // 保護者（student）はスケジュール管理にリダイレクト
+  return <Navigate to="/schedule" replace />;
+};
+
 const PublicRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -34,6 +81,18 @@ const PublicRoute = ({ children }: { children: ReactNode }) => {
   }
 
   return <>{children}</>;
+};
+
+// ロールに基づいてリダイレクトするコンポーネント
+const RoleBasedRedirect = () => {
+  const { user } = useAuth();
+
+  if (user?.role === "student") {
+    // student = 保護者
+    return <Navigate to="/schedule" replace />;
+  }
+
+  return <Dashboard />;
 };
 
 function App() {
@@ -57,25 +116,44 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Dashboard />} />
-            <Route path="schedule" element={<Schedule />} />
-            <Route path="students" element={<StudentsList />} />
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <RoleBasedRedirect />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="schedule"
+              element={
+                <ParentAccessibleRoute>
+                  <Schedule />
+                </ParentAccessibleRoute>
+              }
+            />
+            <Route
+              path="students"
+              element={
+                <AdminTeacherRoute>
+                  <StudentsList />
+                </AdminTeacherRoute>
+              }
+            />
             <Route
               path="curriculum"
               element={
-                <div className="p-6">
-                  <h2>カリキュラム管理</h2>
-                  <p>開発中...</p>
-                </div>
+                <ParentAccessibleRoute>
+                  <CurriculumManagement />
+                </ParentAccessibleRoute>
               }
             />
             <Route
               path="ai"
               element={
-                <div className="p-6">
-                  <h2>AI連携</h2>
-                  <p>開発中...</p>
-                </div>
+                <AdminTeacherRoute>
+                  <AIIntegration />
+                </AdminTeacherRoute>
               }
             />
           </Route>
