@@ -305,7 +305,6 @@ export const CurriculumManagement = () => {
                         key={`${curriculum.id}-lesson-${lesson.lessonNumber}`}
                         lesson={lesson}
                         totalLessons={lessonDetails.length}
-                        allLessons={lessonDetails}
                         isSelected={isSelected}
                         isNextItem={isNextItem}
                         onRadioChange={(lessonNumber) => {
