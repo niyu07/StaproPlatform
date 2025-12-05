@@ -9,7 +9,7 @@ import {
 interface User {
   email: string;
   name: string;
-  role: "admin" | "teacher" | "student";
+  role: "admin" | "teacher" | "student"; // student = 保護者
 }
 
 interface AuthContextValue {

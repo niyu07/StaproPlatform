@@ -14,7 +14,7 @@ export const Sidebar = () => {
       case "teacher":
         return "Teacher";
       case "student":
-        return "Student";
+        return "Parent"; // student = 保護者
       case "admin":
         return "Admin";
       default:
@@ -26,13 +26,20 @@ export const Sidebar = () => {
     void logout();
   };
 
-  const navItems = [
-    { icon: LayoutGrid, label: "ダッシュボード", path: "/" },
-    { icon: Calendar, label: "スケジュール管理", path: "/schedule" },
-    { icon: Users, label: "生徒情報", path: "/students" },
-    { icon: BookOpen, label: "カリキュラム管理", path: "/curriculum" },
-    { icon: Settings, label: "AI連携", path: "/ai" },
+  // 全ナビゲーション項目
+  const allNavItems = [
+    { icon: LayoutGrid, label: "ダッシュボード", path: "/", roles: ["admin", "teacher"] },
+    { icon: Calendar, label: "スケジュール管理", path: "/schedule", roles: ["admin", "teacher", "student"] }, // student = 保護者
+    { icon: Users, label: "生徒情報", path: "/students", roles: ["admin", "teacher"] },
+    { icon: BookOpen, label: "カリキュラム管理", path: "/curriculum", roles: ["admin", "teacher", "student"] }, // student = 保護者
+    { icon: Settings, label: "AI連携", path: "/ai", roles: ["admin", "teacher"] },
   ];
+
+  // ユーザーのロールに基づいて表示する項目をフィルタリング
+  const navItems = allNavItems.filter((item) => {
+    if (!user?.role) return false;
+    return item.roles.includes(user.role);
+  });
 
   return (
     <aside className="w-[260px] bg-background border-r border-border flex flex-col h-full flex-shrink-0">
