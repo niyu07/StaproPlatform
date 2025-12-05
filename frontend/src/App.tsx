@@ -5,6 +5,7 @@ import Dashboard from "./features/home/Dashboard";
 import { StudentsList } from "./pages/StudentsList";
 import { Schedule } from "./pages/Schedule";
 import { Login } from "./pages/Login/Login";
+import { AIIntegration } from "./pages/AIIntegration";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
@@ -69,15 +70,7 @@ function App() {
                 </div>
               }
             />
-            <Route
-              path="ai"
-              element={
-                <div className="p-6">
-                  <h2>AI連携</h2>
-                  <p>開発中...</p>
-                </div>
-              }
-            />
+            <Route path="ai" element={<AIIntegration />} />
           </Route>
         </Routes>
       </AuthProvider>
