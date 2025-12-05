@@ -8,6 +8,7 @@ type Props = {
   isSelected?: boolean; // ラジオボタンで選択されているか
   isNextItem?: boolean; // 次の授業回か（「次回ここから」を表示するか）
   onRadioChange?: (lessonNumber: number) => void; // ラジオボタン変更時のコールバック
+  disabled?: boolean; // 編集不可（保護者用）
 };
 
 export const LessonCard = ({
@@ -18,6 +19,7 @@ export const LessonCard = ({
   isSelected = false,
   isNextItem = false,
   onRadioChange,
+  disabled = false,
 }: Props) => {
   // その授業回の中で最も進んでいる小項目の進捗を取得
   const lessonProgress = Math.max(
@@ -45,6 +47,7 @@ export const LessonCard = ({
 
   const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (disabled) return; // 保護者の場合は操作不可
     // チェックマークを押したら、ラジオボタンの選択として扱う（次の授業回に「次回ここから」を表示）
     if (onRadioChange) {
       onRadioChange(lesson.lessonNumber);
@@ -93,8 +96,9 @@ export const LessonCard = ({
           <button
             type="button"
             onClick={handleToggleComplete}
-            className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${iconClass} hover:scale-110`}
-            title={isSelected ? "選択中" : isCompleted ? "未達成に戻す" : "達成にする"}
+            disabled={disabled}
+            className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${iconClass} ${disabled ? "cursor-not-allowed opacity-50" : "hover:scale-110"}`}
+            title={disabled ? "閲覧のみ" : isSelected ? "選択中" : isCompleted ? "未達成に戻す" : "達成にする"}
           >
             {showCheckmark ? "✓" : ""}
           </button>

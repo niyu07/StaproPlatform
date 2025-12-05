@@ -21,11 +21,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const CurriculumManagement = () => {
-  // デフォルトで最初の生徒を選択
+  const { user } = useAuth();
+  const isParent = user?.role === "student"; // student = 保護者
+
+  // 保護者の場合は最初の生徒を自動選択、それ以外は選択可能
   const [selectedStudentId, setSelectedStudentId] = useState<number>(
-    mockStudents[0]?.user_id ?? 0,
+    isParent ? (mockStudents[0]?.user_id ?? 0) : (mockStudents[0]?.user_id ?? 0),
   );
   // 選択されたカリキュラムマスタID（スクラッチ、HTML/CSSなど）
   const [selectedCurriculumMasterId, setSelectedCurriculumMasterId] =
@@ -81,7 +85,13 @@ export const CurriculumManagement = () => {
     (cm) => cm.id === selectedCurriculumMasterId,
   );
 
+  // 保護者の場合はすべてのカリキュラムを表示、それ以外は選択されたカリキュラムマスタでフィルタリング
   const filteredCurriculums = useMemo(() => {
+    if (isParent) {
+      // 保護者の場合は、選択された生徒のすべてのカリキュラムを表示
+      return curriculums.filter((c) => c.userId === selectedStudentId);
+    }
+    // 管理者・教師の場合は、選択されたカリキュラムマスタでフィルタリング
     if (!selectedCurriculumMasterId || !selectedCurriculumMaster) return [];
     return curriculums.filter(
       (c) =>
@@ -93,6 +103,7 @@ export const CurriculumManagement = () => {
     selectedStudentId,
     selectedCurriculumMasterId,
     selectedCurriculumMaster,
+    isParent,
   ]);
 
   const handleOpenDetail = (curriculum: CurriculumDisplay) => {
@@ -173,8 +184,9 @@ export const CurriculumManagement = () => {
         </p>
       </div>
 
-      {/* ステップ1: 生徒選択 */}
-      <Card className="mb-4">
+      {/* ステップ1: 生徒選択（保護者の場合は非表示） */}
+      {!isParent && (
+        <Card className="mb-4">
         <CardHeader>
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
@@ -209,9 +221,10 @@ export const CurriculumManagement = () => {
           </Select>
         </CardContent>
       </Card>
+      )}
 
-      {/* ステップ2: カリキュラム名選択（生徒選択後に表示） */}
-      {availableCurriculumMasters.length > 0 && (
+      {/* ステップ2: カリキュラム名選択（保護者の場合は非表示） */}
+      {!isParent && availableCurriculumMasters.length > 0 && (
         <div className="mb-4 flex gap-4">
           <Card className="flex-1">
             <CardHeader>
@@ -255,43 +268,266 @@ export const CurriculumManagement = () => {
       )}
 
       {/* ステップ3: カリキュラムの順番（授業回）表示 */}
-      {selectedCurriculumMaster && (
+      {isParent ? (
+        // 保護者の場合は、すべてのカリキュラムをカテゴリごとに表示
         <>
-          <Card className="mb-4">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  3
-                </span>
-                <div className="flex flex-1 items-center justify-between">
-                  <div className="text-sm font-medium">
-                    <span className="font-semibold">
-                      {selectedStudent?.name ?? "生徒未選択"}
-                    </span>
-                    {" - "}
-                    <span className="font-semibold">
-                      {selectedCurriculumMaster.name}
-                    </span>
-                    カリキュラムの進捗
-                  </div>
-                  <div className="text-xs font-semibold text-primary">
-                    進捗 {progressPercent}%
+          {availableCurriculumMasters.map((master) => {
+              const masterCurriculums = filteredCurriculums.filter(
+                (c) => c.category === master.name,
+              );
+              if (masterCurriculums.length === 0) return null;
+
+              // カテゴリごとの進捗を計算
+              const calculateMasterProgress = () => {
+                const curriculum = masterCurriculums[0];
+                if (curriculum.lessonDetails && curriculum.lessonDetails.length > 0) {
+                  const totalLessons = curriculum.lessonDetails.length;
+                  let completedLessons = 0;
+                  for (const lesson of curriculum.lessonDetails) {
+                    const lessonProgress = Math.max(
+                      lesson.progress1 ?? 0,
+                      lesson.progress2 ?? 0,
+                      lesson.progress3 ?? 0,
+                      lesson.progress4 ?? 0,
+                      lesson.progress5 ?? 0,
+                      lesson.progress6 ?? 0,
+                      lesson.progress7 ?? 0,
+                      lesson.progress8 ?? 0,
+                      lesson.overallProgress ?? 0,
+                    );
+                    if (lessonProgress >= 100) {
+                      completedLessons++;
+                    }
+                  }
+                  return Math.round((completedLessons / totalLessons) * 100);
+                }
+                return curriculum.progress;
+              };
+              const masterProgress = calculateMasterProgress();
+
+              return (
+                <div key={master.id} className="mb-6">
+                  <Card className="mb-4">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                          3
+                        </span>
+                        <div className="flex flex-1 items-center justify-between">
+                          <div className="text-sm font-medium">
+                            <span className="font-semibold">
+                              {selectedStudent?.name ?? "生徒未選択"}
+                            </span>
+                            {" - "}
+                            <span className="font-semibold">{master.name}</span>
+                            カリキュラムの進捗
+                          </div>
+                          <div className="text-xs font-semibold text-primary">
+                            進捗 {masterProgress}%
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-2 w-full rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-primary transition-all"
+                          style={{ width: `${masterProgress}%` }}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* カリキュラムの順番（授業回）カードグリッド */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {masterCurriculums.flatMap((curriculum) => {
+                      // スクラッチカリキュラムの場合、授業回詳細を表示
+                      if (
+                        curriculum.lessonDetails &&
+                        curriculum.lessonDetails.length > 0
+                      ) {
+                        const lessonDetails = curriculum.lessonDetails;
+                        const selectedIndex = lessonDetails.findIndex(
+                          (l) => l.lessonNumber === selectedRadioLessonNumber,
+                        );
+                        return lessonDetails.map((lesson, index) => {
+                          const isSelected =
+                            selectedRadioLessonNumber === lesson.lessonNumber;
+                          const isNextItem =
+                            selectedIndex >= 0 && index === selectedIndex + 1;
+
+                          return (
+                            <LessonCard
+                              key={`${curriculum.id}-lesson-${lesson.lessonNumber}`}
+                              lesson={lesson}
+                              totalLessons={lessonDetails.length}
+                              isSelected={isSelected}
+                              isNextItem={isNextItem}
+                              disabled={isParent}
+                              onRadioChange={(lessonNumber) => {
+                                if (!isParent) {
+                                  setSelectedRadioLessonNumber(lessonNumber);
+                                }
+                              }}
+                              onClickDetail={() => {
+                                setSelectedCurriculum(curriculum);
+                                setIsModalOpen(true);
+                              }}
+                              onToggleComplete={(lessonNumber, isCompleted) => {
+                                if (isParent) return;
+                                setCurriculums((prev) =>
+                                  prev.map((c) => {
+                                    if (c.id === curriculum.id && c.lessonDetails) {
+                                      const updatedLessonDetails =
+                                        c.lessonDetails.map((l) => {
+                                          if (l.lessonNumber === lessonNumber) {
+                                            const targetProgress = isCompleted
+                                              ? 100
+                                              : 0;
+                                            const updated: LessonDetail = { ...l };
+                                            if (updated.progress1 !== undefined) {
+                                              updated.progress1 = targetProgress;
+                                            }
+                                            if (updated.progress2 !== undefined) {
+                                              updated.progress2 = targetProgress;
+                                            }
+                                            if (updated.progress3 !== undefined) {
+                                              updated.progress3 = targetProgress;
+                                            }
+                                            if (updated.progress4 !== undefined) {
+                                              updated.progress4 = targetProgress;
+                                            }
+                                            if (updated.progress5 !== undefined) {
+                                              updated.progress5 = targetProgress;
+                                            }
+                                            if (updated.progress6 !== undefined) {
+                                              updated.progress6 = targetProgress;
+                                            }
+                                            if (updated.progress7 !== undefined) {
+                                              updated.progress7 = targetProgress;
+                                            }
+                                            if (updated.progress8 !== undefined) {
+                                              updated.progress8 = targetProgress;
+                                            }
+                                            if (
+                                              updated.overallProgress !== undefined
+                                            ) {
+                                              updated.overallProgress = targetProgress;
+                                            }
+                                            return updated;
+                                          }
+                                          return l;
+                                        });
+                                      const allProgresses = updatedLessonDetails
+                                        .flatMap((l) => [
+                                          l.progress1,
+                                          l.progress2,
+                                          l.progress3,
+                                          l.progress4,
+                                          l.progress5,
+                                          l.progress6,
+                                          l.progress7,
+                                          l.progress8,
+                                          l.overallProgress,
+                                        ])
+                                        .filter((p): p is number => p !== undefined);
+                                      const maxProgress =
+                                        allProgresses.length > 0
+                                          ? Math.max(...allProgresses)
+                                          : 0;
+                                      return {
+                                        ...c,
+                                        lessonDetails: updatedLessonDetails,
+                                        progress: maxProgress,
+                                      };
+                                    }
+                                    return c;
+                                  }),
+                                );
+                              }}
+                            />
+                          );
+                        });
+                      }
+                      // 通常のカリキュラムの場合、カードを表示
+                      return [];
+                    })}
+                    {(() => {
+                      const normalCurriculums = masterCurriculums.filter(
+                        (c) => !c.lessonDetails || c.lessonDetails.length === 0,
+                      );
+                      const selectedIndex = normalCurriculums.findIndex(
+                        (c) => c.id === selectedRadioCurriculumId,
+                      );
+                      return normalCurriculums.map((curriculum, index) => {
+                        const isSelected =
+                          selectedRadioCurriculumId === curriculum.id;
+                        const isNextItem =
+                          selectedIndex >= 0 && index === selectedIndex + 1;
+
+                        return (
+                          <CurriculumCard
+                            key={curriculum.id}
+                            curriculum={curriculum}
+                            onClickDetail={() => handleOpenDetail(curriculum)}
+                            index={index + 1}
+                            isSelected={isSelected}
+                            isNextItem={isNextItem}
+                            disabled={isParent}
+                            onRadioChange={(curriculumId: string) => {
+                              if (!isParent) {
+                                setSelectedRadioCurriculumId(curriculumId);
+                              }
+                            }}
+                          />
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-2 w-full rounded-full bg-muted">
-                <div
-                  className="h-2 rounded-full bg-primary transition-all"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </CardContent>
-          </Card>
+              );
+            })}
+        </>
+      ) : (
+            // 管理者・教師の場合は従来通り
+            <>
+              {selectedCurriculumMaster && (
+                <>
+                  <Card className="mb-4">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                          3
+                        </span>
+                        <div className="flex flex-1 items-center justify-between">
+                          <div className="text-sm font-medium">
+                            <span className="font-semibold">
+                              {selectedStudent?.name ?? "生徒未選択"}
+                            </span>
+                            {" - "}
+                            <span className="font-semibold">
+                              {selectedCurriculumMaster.name}
+                            </span>
+                            カリキュラムの進捗
+                          </div>
+                          <div className="text-xs font-semibold text-primary">
+                            進捗 {progressPercent}%
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-2 w-full rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-primary transition-all"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
 
-          {/* カリキュラムの順番（授業回）カードグリッド */}
-          {selectedCurriculumMaster && filteredCurriculums.length > 0 ? (
+                  {/* カリキュラムの順番（授業回）カードグリッド */}
+                  {filteredCurriculums.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
               {filteredCurriculums.flatMap((curriculum) => {
                 // スクラッチカリキュラムの場合、授業回詳細を表示
@@ -422,8 +658,11 @@ export const CurriculumManagement = () => {
                       index={index + 1}
                       isSelected={isSelected}
                       isNextItem={isNextItem}
+                      disabled={isParent}
                       onRadioChange={(curriculumId: string) => {
-                        setSelectedRadioCurriculumId(curriculumId);
+                        if (!isParent) {
+                          setSelectedRadioCurriculumId(curriculumId);
+                        }
                       }}
                     />
                   );
@@ -437,14 +676,17 @@ export const CurriculumManagement = () => {
               </CardContent>
             </Card>
           )}
-        </>
-      )}
+                </>
+              )}
+            </>
+          )}
 
       <CurriculumEditModal
         open={isModalOpen}
         curriculum={selectedCurriculum}
         onClose={handleCloseModal}
-        onSave={handleSaveProgress}
+        onSave={isParent ? undefined : handleSaveProgress}
+        readOnly={isParent}
       />
 
       <CreateCurriculumModal

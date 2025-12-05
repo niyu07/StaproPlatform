@@ -18,6 +18,7 @@ type Props = {
     lessonNumber: number,
     lessonDetail: LessonDetail,
   ) => void;
+  readOnly?: boolean; // 閲覧のみ（保護者用）
 };
 
 export const CurriculumEditModal = ({
@@ -26,6 +27,7 @@ export const CurriculumEditModal = ({
   onClose,
   onSave,
   onSaveLessonDetail,
+  readOnly = false,
 }: Props) => {
   const [progress, setProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<"overview" | "lessons">(
@@ -236,15 +238,17 @@ export const CurriculumEditModal = ({
                               type="number"
                               min="0"
                               max="100"
-                              className="w-16 rounded border px-2 py-1 text-xs"
+                              disabled={readOnly}
+                              className="w-16 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                               value={lesson.progress1}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                if (readOnly) return;
                                 handleSaveLessonProgress(
                                   lesson.lessonNumber,
                                   "progress1",
                                   Number(e.target.value),
-                                )
-                              }
+                                );
+                              }}
                             />
                             <span className="text-xs text-muted-foreground">
                               %
@@ -264,15 +268,17 @@ export const CurriculumEditModal = ({
                               type="number"
                               min="0"
                               max="100"
-                              className="w-16 rounded border px-2 py-1 text-xs"
+                              disabled={readOnly}
+                              className="w-16 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                               value={lesson.progress2}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                if (readOnly) return;
                                 handleSaveLessonProgress(
                                   lesson.lessonNumber,
                                   "progress2",
                                   Number(e.target.value),
-                                )
-                              }
+                                );
+                              }}
                             />
                             <span className="text-xs text-muted-foreground">
                               %
@@ -297,15 +303,17 @@ export const CurriculumEditModal = ({
                               type="number"
                               min="0"
                               max="100"
-                              className="w-16 rounded border px-2 py-1 text-xs"
+                              disabled={readOnly}
+                              className="w-16 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                               value={lesson.progress3}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                if (readOnly) return;
                                 handleSaveLessonProgress(
                                   lesson.lessonNumber,
                                   "progress3",
                                   Number(e.target.value),
-                                )
-                              }
+                                );
+                              }}
                             />
                             <span className="text-xs text-muted-foreground">
                               %
@@ -325,15 +333,17 @@ export const CurriculumEditModal = ({
                               type="number"
                               min="0"
                               max="100"
-                              className="w-16 rounded border px-2 py-1 text-xs"
+                              disabled={readOnly}
+                              className="w-16 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                               value={lesson.progress4}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                if (readOnly) return;
                                 handleSaveLessonProgress(
                                   lesson.lessonNumber,
                                   "progress4",
                                   Number(e.target.value),
-                                )
-                              }
+                                );
+                              }}
                             />
                             <span className="text-xs text-muted-foreground">
                               %
@@ -358,15 +368,17 @@ export const CurriculumEditModal = ({
                               type="number"
                               min="0"
                               max="100"
-                              className="w-16 rounded border px-2 py-1 text-xs"
+                              disabled={readOnly}
+                              className="w-16 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                               value={lesson.progress5}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                if (readOnly) return;
                                 handleSaveLessonProgress(
                                   lesson.lessonNumber,
                                   "progress5",
                                   Number(e.target.value),
-                                )
-                              }
+                                );
+                              }}
                             />
                             <span className="text-xs text-muted-foreground">
                               %
@@ -389,9 +401,11 @@ export const CurriculumEditModal = ({
 
         <div className="flex justify-end gap-2 border-t p-6">
           <Button variant="outline" onClick={onClose}>
-            キャンセル
+            {readOnly ? "閉じる" : "キャンセル"}
           </Button>
-          <Button onClick={handleSave}>保存</Button>
+          {!readOnly && (
+            <Button onClick={handleSave}>保存</Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

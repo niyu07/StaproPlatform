@@ -7,6 +7,7 @@ type Props = {
   isSelected?: boolean;
   isNextItem?: boolean;
   onRadioChange?: (curriculumId: string) => void;
+  disabled?: boolean; // 編集不可（保護者用）
 };
 
 export const CurriculumCard = ({
@@ -16,6 +17,7 @@ export const CurriculumCard = ({
   isSelected = false,
   isNextItem = false,
   onRadioChange,
+  disabled = false,
 }: Props) => {
   const isCompleted = curriculum.cardStatus === "completed";
   const hasProgress = curriculum.progress > 0 && curriculum.progress < 100;
@@ -56,7 +58,8 @@ export const CurriculumCard = ({
               checked={isSelected}
               onChange={() => {}}
               onClick={handleRadioClick}
-              className="h-4 w-4 cursor-pointer"
+              disabled={disabled}
+              className={`h-4 w-4 ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
             />
             <span
               className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${iconClass}`}
