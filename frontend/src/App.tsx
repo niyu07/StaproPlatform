@@ -6,6 +6,7 @@ import { StudentsList } from "./pages/StudentsList";
 import { Schedule } from "./pages/Schedule";
 import { Login } from "./pages/Login/Login";
 import { AIIntegration } from "./pages/AIIntegration";
+import { CurriculumManagement } from "./pages/CurriculumManagement";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
@@ -143,10 +144,7 @@ function App() {
               path="curriculum"
               element={
                 <ParentAccessibleRoute>
-                  <div className="p-6">
-                    <h2>カリキュラム管理</h2>
-                    <p>開発中...</p>
-                  </div>
+                  <CurriculumManagement />
                 </ParentAccessibleRoute>
               }
             />
